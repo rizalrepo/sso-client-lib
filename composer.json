@@ -1,19 +1,20 @@
 {
-    "name": "rizalrepo/sso-client",
-    "description": "Laravel SSO Client",
-    "license": "MIT",
+    "name": "rizalrepo/laravel-sso-client",
+    "description": "Laravel SSO Client Library",
+    "type": "library",
+    "require": {
+        "php": "^7.4|^8.0"
+    },
     "autoload": {
         "psr-4": {
-            "Rizalrepo\\SsoClient\\": "src/"
+            "rizalrepo\\LaravelSSOClient\\": "src/"
         }
     },
-    "authors": [
-        {
-            "name": "rizalrepo",
-            "email": "rizalyusei@gmail.com"
+    "extra": {
+        "laravel": {
+            "providers": [
+                "rizalrepo\\LaravelSSOClient\\SSOClientServiceProvider"
+            ]
         }
-    ],
-    "require": {
-        "php": "^8.0"
     }
 }
