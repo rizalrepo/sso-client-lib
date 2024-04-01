@@ -2,6 +2,7 @@
     "name": "rizalrepo/laravel-sso-client",
     "description": "Laravel SSO Client Library",
     "type": "library",
+    "license": "MIT",
     "require": {
         "php": "^7.4|^8.0"
     },
