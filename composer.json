@@ -1,0 +1,17 @@
+{
+    "name": "rizalrepo/sso-client",
+    "description": "Laravel SSO Client",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Rizalrepo\\SsoClient\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "rizalrepo",
+            "email": "rizalyusei@gmail.com"
+        }
+    ],
+    "require": {}
+}
