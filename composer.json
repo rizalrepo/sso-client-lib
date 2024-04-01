@@ -13,5 +13,7 @@
             "email": "rizalyusei@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "rizalrepo/sso-client": "^1.0"
+    }
 }
