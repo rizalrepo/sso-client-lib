@@ -9,17 +9,14 @@
     },
     "autoload": {
         "psr-4": {
-            "rizalrepo\\LaravelSSOClient\\": "src/"
+            "rizalrepo\\unism-sso-client\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "rizalrepo\\LaravelSSOClient\\SSOClientServiceProvider"
+                "rizalrepo\\unism-sso-client\\SSOClientServiceProvider"
             ]
         }
-    },
-    "config": {
-        "minimum-stability": "dev"
     }
 }
