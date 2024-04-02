@@ -5,7 +5,7 @@
     "require": {
         "illuminate/support": "^11.1",
         "php": "^7.4|^8.0",
-        "rizalrepo/sso-client": "dev"
+        "rizalrepo/unism-sso-client": "dev"
     },
     "require-dev": {
         "illuminate/support": "^11.1"
