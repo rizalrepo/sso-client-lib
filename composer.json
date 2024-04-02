@@ -5,12 +5,10 @@
     "require": {
         "illuminate/support": "^11.1",
         "php": "^7.4|^8.0",
-        "rizalrepo/sso-client": "dev-master"
+        "rizalrepo/sso-client": "dev"
     },
     "require-dev": {
-        "illuminate/support": "^11.1",
-        "php": "^7.4|^8.0",
-        "rizalrepo/sso-client": "dev-master"
+        "illuminate/support": "^11.1"
     },
     "license": "MIT",
     "autoload": {
