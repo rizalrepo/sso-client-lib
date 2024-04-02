@@ -15,7 +15,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "rizalrepo\\unism-sso-client\\SSOClientServiceProvider"
+                "rizalrepo\\unism-sso-client\\src\\SSOClientServiceProvider"
             ]
         }
     }
