@@ -3,10 +3,14 @@
     "description": "SSO Client OAuth 2.0",
     "type": "laravel-package",
     "require": {
-        "illuminate/support": "^11.1"
+        "illuminate/support": "^11.1",
+        "php": "^7.4|^8.0",
+        "rizalrepo/sso-client": "dev-main"
     },
     "require-dev": {
-        "illuminate/support": "^11.1"
+        "illuminate/support": "^11.1",
+        "php": "^7.4|^8.0",
+        "rizalrepo/sso-client": "dev-main"
     },
     "license": "MIT",
     "autoload": {
