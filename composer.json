@@ -4,8 +4,7 @@
     "type": "laravel-package",
     "require": {
         "illuminate/support": "^11.1",
-        "php": "^7.4|^8.0",
-        "rizalrepo/unism-sso-client": "dev-main"
+        "php": "^7.4|^8.0"
     },
     "require-dev": {
         "illuminate/support": "^11.1"
