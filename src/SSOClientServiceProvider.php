@@ -10,7 +10,7 @@ class SSOClientServiceProvider extends ServiceProvider
     {
         $this->loadRoutesFrom(__DIR__ . '/routes.php');
         $this->publishes([
-            __DIR__ . '/SSOController.php' => $this->getControllerPath('SSOController.php'),
+            __DIR__ . '/SSOController.php' => app_path('Http/Controllers/SSO/SSOController.php'),
         ], 'sso-controller');
     }
 
@@ -19,8 +19,8 @@ class SSOClientServiceProvider extends ServiceProvider
         //
     }
 
-    protected function getControllerPath($fileName)
-    {
-        return realpath(__DIR__ . '/../../app/Http/Controllers/') . '/' . $fileName;
-    }
+    // protected function getControllerPath($fileName)
+    // {
+    //     return realpath(__DIR__ . '/../../app/Http/Controllers/') . '/' . $fileName;
+    // }
 }
