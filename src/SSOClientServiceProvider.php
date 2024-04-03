@@ -1,6 +1,6 @@
 <?php
 
-namespace rizalrepo\SSOClientServiceProvider;
+namespace rizalrepo\LaravelSSOClient\SSOClientServiceProvider;
 
 use Illuminate\Support\ServiceProvider;
 
