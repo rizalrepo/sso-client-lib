@@ -1,6 +1,6 @@
 <?php
 
-namespace rizalrepo\SSOClient;
+namespace rizalrepo\SsoClient;
 
 use Illuminate\Support\ServiceProvider;
 
