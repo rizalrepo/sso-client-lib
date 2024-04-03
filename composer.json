@@ -25,7 +25,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "rizalrepo\\SsoClient\\SSOClientServiceProvider"
+                "Rizalrepo\\SsoClient\\SSOClientServiceProvider"
             ]
         }
     }
