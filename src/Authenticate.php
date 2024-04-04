@@ -1,7 +1,13 @@
 <?php
 
 /**
- * Copy code dibawah ini dan tambahkan ke file Authenticate.php
+ * untuk laravel 11 :
+ * ketikkan command php artisan make:middleware Authenticate kemudian Copy code dibawah ini kemudian
+ * akses file bootstrap/app.php lalu copy 'Authenticate' => \App\Http\Middleware\Authenticate::class,
+ * 
+ * 
+ * untuk laravel 10 :
+ * Copy code dibawah ini dan edit file Authenticate.php
  */
 
 namespace App\Http\Middleware;

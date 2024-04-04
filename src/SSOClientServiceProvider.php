@@ -26,7 +26,7 @@ class SSOClientServiceProvider extends ServiceProvider
     protected function publishMiddleware()
     {
         $this->publishes([
-            __DIR__ . '/Authenticate.php' => App::path('Http/Middleware/Authenticate.php'),
+            __DIR__ . '/Authenticate.php' => App::path('Http/Middleware/sso.php'),
         ], 'sso-config');
     }
 
