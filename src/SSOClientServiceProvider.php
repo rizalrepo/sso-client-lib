@@ -7,25 +7,6 @@ use Illuminate\Support\Facades\App;
 
 class SSOClientServiceProvider extends ServiceProvider
 {
-    // public function boot()
-    // {
-    //     $this->publishes([
-    //         __DIR__ . '/app.blade.php' => app_path('../resources/views/sso/config.blade.php'),
-    //     ], 'sso-config');
-    //     $this->publishes([
-    //         __DIR__ . '/Authenticate.php' => app_path('Http/Middleware/Authenticate.php'),
-    //     ], 'sso-config');
-    //     $this->publishes([
-    //         __DIR__ . '/routes.php' => app_path('../routes/sso.php'),
-    //     ], 'sso-config');
-    //     $this->publishes([
-    //         __DIR__ . '/SSOController.php' => app_path('Http/Controllers/SSO/SSOController.php'),
-    //     ], 'sso-config');
-    //     $this->publishes([
-    //         __DIR__ . '/users_table.php' => app_path('../database/sso/users_table_structure.php'),
-    //     ], 'sso-config');
-    // }
-
     public function boot()
     {
         $this->publishViews();
