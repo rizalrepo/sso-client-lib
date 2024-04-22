@@ -20,9 +20,9 @@ class SSOController extends Controller
             case 'serverUrl':
                 return "http://127.0.0.1:8000";
             case 'clientId':
-                return "129e5bbd-1fbd-4116-a06b-9e1011e830cc";
+                return "a4cf7da2-0af1-4137-9bee-498bf9ab64c5";
             case 'clientSecret':
-                return "o75CNKPdoCx1fmVZXvzkXEZxRAAcSzsF3hOZgwWJ";
+                return "UzZ5LiZSEqaU4TO4fr46sS8ENPOjK0wdQ4AiyMZY";
             default:
                 return null;
         }
@@ -59,6 +59,7 @@ class SSOController extends Controller
                 "code" => $request->code
             ]
         );
+
         $request->session()->put($response->json());
         return redirect()->route("sso.connect");
     }
@@ -80,13 +81,15 @@ class SSOController extends Controller
         $user = User::where("username", $userArray['username'])->first();
 
         if (!$user) {
-            $client = collect($userArray['oauth_client_users'])->first();
+            $client = array_filter($userArray['oauth_client_users'], function ($item) {
+                return $item['oauth_client_role']['oauth_client']['id'] === $this->getConfig('clientId');
+            });
             $user = new User;
             $user->name = $userArray['name'];
             $user->username = $userArray['username'];
             $user->phone = $userArray['phone'];
             $user->email_verified_at = $userArray['email_verified_at'];
-            $user->oauth_client_role_id = $client['oauth_client_role_id'];
+            $user->oauth_client_role_id = reset($client)['oauth_client_role_id'];
             $user->save();
         }
 
