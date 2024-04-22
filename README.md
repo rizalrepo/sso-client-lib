@@ -52,6 +52,7 @@ php artisan make:middleware Authenticate
 then update code bellow to Middleware/Authenticate.php
 
 ```
+<?php
 namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
@@ -86,6 +87,7 @@ for Laravel 10 :
 update code bellow to Middleware/Authenticate.php
 
 ```
+<?php
 namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
