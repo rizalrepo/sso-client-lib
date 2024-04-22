@@ -1,7 +1,15 @@
 # Client Usage Config
 
+# publish controller
+
+```
+php artisan vendor:publish --tag=sso-config
+```
+
 # Routes
+
 add code to web.php
+
 ```
 Route::controller(SSOController::class)->group(function () {
     Route::get("/sso/login", 'getLogin')->name("sso.login");
@@ -15,8 +23,11 @@ Route::controller(SSOController::class)->group(function () {
     });
 });
 ```
+
 # Table
-modify file users migration with : 
+
+modify file users migration with :
+
 ```
 Schema::create('users', function (Blueprint $table) {
     $table->id();
@@ -29,12 +40,17 @@ Schema::create('users', function (Blueprint $table) {
     $table->timestamps();
 });
 ```
+
 # Middleware Settings
+
 for Laravel 11 add command :
+
 ```
 php artisan make:middleware Authenticate
 ```
+
 then update code bellow to Middleware/Authenticate.php
+
 ```
 namespace App\Http\Middleware;
 
@@ -59,12 +75,16 @@ class Authenticate extends Middleware
     }
 }
 ```
-then copy code below to file bootstrap/app.php 
+
+then copy code below to file bootstrap/app.php
+
 ```
 $middleware->alias(['auth' => Authenticate::class]);
 ```
- for Laravel 10 :
- update code bellow to Middleware/Authenticate.php
+
+for Laravel 10 :
+update code bellow to Middleware/Authenticate.php
+
 ```
 namespace App\Http\Middleware;
 
@@ -91,7 +111,9 @@ class Authenticate extends Middleware
 ```
 
 # Views Config
+
 use code bellow for direct url portal, edit-password and logout
+
 ```
 {{-- in app blade --}}
 
