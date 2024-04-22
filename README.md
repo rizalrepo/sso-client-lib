@@ -1,4 +1,3 @@
-add code below to web.php
 
 Route::controller(SSOController::class)->group(function () {
     Route::get("/sso/login", 'getLogin')->name("sso.login");
@@ -12,9 +11,6 @@ Route::controller(SSOController::class)->group(function () {
     });
 });
 
--------------------------------------------------------------------------------------------
-
-modify users table migration file
 public function up(): void
 {
     Schema::create('users', function (Blueprint $table) {
