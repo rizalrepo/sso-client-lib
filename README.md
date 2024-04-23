@@ -6,6 +6,28 @@
 php artisan vendor:publish --tag=sso-config
 ```
 
+# SSOController
+
+open SSOController.php and adjust config with your preference
+
+```
+private function getConfig($configName)
+{
+    switch ($configName) {
+        case 'callbackUrl':
+            return "http://127.0.0.1:8080/callback";
+        case 'serverUrl':
+            return "http://127.0.0.1:8000";
+        case 'clientId':
+            return "a4cf7da2-0af1-4137-9bee-498bf9ab64c5";
+        case 'clientSecret':
+            return "UzZ5LiZSEqaU4TO4fr46sS8ENPOjK0wdQ4AiyMZY";
+        default:
+            return null;
+    }
+}
+```
+
 # Routes
 
 add code to web.php
@@ -49,7 +71,7 @@ for Laravel 11 add command :
 php artisan make:middleware Authenticate
 ```
 
-then update code bellow to Middleware/Authenticate.php
+then update code bellow to Middleware/Authenticate.php and adjust config with your preference
 
 ```
 <?php
@@ -84,7 +106,7 @@ $middleware->alias(['auth' => Authenticate::class]);
 ```
 
 for Laravel 10 :
-update code bellow to Middleware/Authenticate.php
+update code bellow to Middleware/Authenticate.php and adjust config with your preference
 
 ```
 <?php
