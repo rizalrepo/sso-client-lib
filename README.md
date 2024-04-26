@@ -1,6 +1,12 @@
 # Client Usage Config
 
-# publish controller
+# Installation
+
+```
+composer require rizalrepo/sso-client:dev-master
+```
+
+-   then publish SSOController with run command
 
 ```
 php artisan vendor:publish --tag=sso-config
@@ -65,13 +71,13 @@ Schema::create('users', function (Blueprint $table) {
 
 # Middleware Settings
 
-* for Laravel 11 add command :
+-   for Laravel 11 add command :
 
 ```
 php artisan make:middleware Authenticate
 ```
 
-* then update code bellow to Middleware/Authenticate.php and adjust config with your preference
+-   then update code bellow to Middleware/Authenticate.php and adjust config with your preference
 
 ```
 <?php
@@ -99,13 +105,13 @@ class Authenticate extends Middleware
 }
 ```
 
-* then copy code below to file bootstrap/app.php
+-   then copy code below to file bootstrap/app.php
 
 ```
 $middleware->alias(['auth' => Authenticate::class]);
 ```
 
-* for Laravel 10 : update code bellow to Middleware/Authenticate.php and adjust config with your preference
+-   for Laravel 10 : update code bellow to Middleware/Authenticate.php and adjust config with your preference
 
 ```
 <?php
@@ -135,7 +141,7 @@ class Authenticate extends Middleware
 
 # Views Config
 
-* use code bellow for direct url portal, edit-password and logout
+-   use code bellow for direct url portal, edit-password and logout
 
 ```
 {{-- in app blade --}}
@@ -174,8 +180,8 @@ class Authenticate extends Middleware
 
 # User Controller for Client
 
+-   add this code to store function after user created
 
-* add this code to store function after user created
 ```
 $ssoController = new \App\Http\Controllers\SSO\SSOController();
 $userArray = [
@@ -187,7 +193,9 @@ $userArray = [
 
 $ssoController->createUserOnServer($userArray);
 ```
-* add this code to update function after user updated
+
+-   add this code to update function after user updated
+
 ```
 $oldUsername = $user->username; // this code add before update()
 
@@ -201,7 +209,9 @@ $updatedUserArray = [
 $ssoController = new \App\Http\Controllers\SSO\SSOController();
 $ssoController->updateUserOnServer($updatedUserArray);
 ```
-* add this code to destroy function after user deleted
+
+-   add this code to destroy function after user deleted
+
 ```
 $username = $data->username; // this code add before delete()
 

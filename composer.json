@@ -28,11 +28,5 @@
                 "Rizalrepo\\SsoClient\\SSOClientServiceProvider"
             ]
         }
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/rizalrepo/sso-client"
-        }
-    ]
+    }
 }
