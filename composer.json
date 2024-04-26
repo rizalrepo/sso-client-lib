@@ -2,6 +2,7 @@
     "name": "rizalrepo/sso-client",
     "description": "SSO Client OAuth 2.0",
     "type": "laravel-package",
+    "version": "1.0.0",
     "require": {
         "illuminate/support": "^11.1",
         "php": "^7.4|^8.0"
