@@ -172,3 +172,39 @@ use code bellow for direct url portal, edit-password and logout
     }
 </script>
 ```
+
+# User Controller for Client
+
+```
+// add this code to store function after user created
+$ssoController = new \App\Http\Controllers\SSO\SSOController();
+$userArray = [
+    'name' => $user->name,
+    'username' => $user->username,
+    'phone' => $user->phone,
+    'oauth_client_role_id' => $user->oauth_client_role_id,
+];
+
+$ssoController->createUserOnServer($userArray);
+
+// add this code to update function after user updated
+$oldUsername = $user->username; // this code add before update()
+
+$updatedUserArray = [
+    'name' => $user->name,
+    'username' => $user->username,
+    'phone' => $user->phone,
+    'old_username' => $oldUsername,
+];
+
+$ssoController = new \App\Http\Controllers\SSO\SSOController();
+$ssoController->updateUserOnServer($updatedUserArray);
+
+return redirect()->route('user');
+
+// add this code to destroy function after user deleted
+$username = $data->username; // this code add before delete()
+
+$ssoController = new \App\Http\Controllers\SSO\SSOController();
+$ssoController->deleteUserOnServer($username);
+```
