@@ -175,8 +175,9 @@ use code bellow for direct url portal, edit-password and logout
 
 # User Controller for Client
 
+
+* add this code to store function after user created
 ```
-// add this code to store function after user created
 $ssoController = new \App\Http\Controllers\SSO\SSOController();
 $userArray = [
     'name' => $user->name,
@@ -186,8 +187,9 @@ $userArray = [
 ];
 
 $ssoController->createUserOnServer($userArray);
-
-// add this code to update function after user updated
+```
+* add this code to update function after user updated
+```
 $oldUsername = $user->username; // this code add before update()
 
 $updatedUserArray = [
@@ -199,10 +201,9 @@ $updatedUserArray = [
 
 $ssoController = new \App\Http\Controllers\SSO\SSOController();
 $ssoController->updateUserOnServer($updatedUserArray);
-
-return redirect()->route('user');
-
-// add this code to destroy function after user deleted
+```
+* add this code to destroy function after user deleted
+```
 $username = $data->username; // this code add before delete()
 
 $ssoController = new \App\Http\Controllers\SSO\SSOController();
