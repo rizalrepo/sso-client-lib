@@ -5,7 +5,8 @@
     "version": "1.0.0",
     "require": {
         "illuminate/support": "^11.1",
-        "php": "^7.4|^8.0"
+        "php": "^7.4|^8.0",
+        "rizalrepo/sso-client": "^1.0"
     },
     "require-dev": {
         "illuminate/support": "^11.1"
@@ -22,7 +23,7 @@
             "email": "rizalyusei@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "extra": {
         "laravel": {
             "providers": [
