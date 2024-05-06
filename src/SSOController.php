@@ -85,10 +85,10 @@ class SSOController extends Controller
 
         $user = User::where("username", $userArray['username'])->first();
 
+        $client = array_filter($userArray['oauth_client_users'], function ($item) {
+            return $item['oauth_client_role']['oauth_client']['id'] === $this->getConfig('clientId');
+        });
         if (!$user) {
-            $client = array_filter($userArray['oauth_client_users'], function ($item) {
-                return $item['oauth_client_role']['oauth_client']['id'] === $this->getConfig('clientId');
-            });
             $user = new User;
             $user->name = $userArray['name'];
             $user->username = $userArray['username'];
@@ -96,6 +96,12 @@ class SSOController extends Controller
             $user->email_verified_at = $userArray['email_verified_at'];
             $user->oauth_client_role_id = reset($client)['oauth_client_role_id'];
             $user->save();
+        } else {
+            $user->update([
+                'name' => $userArray['name'],
+                'phone' => $userArray['phone'],
+                'oauth_client_role_id' => reset($client)['oauth_client_role_id'],
+            ]);
         }
 
         Auth::login($user);
