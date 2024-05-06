@@ -40,6 +40,7 @@ add code to web.php
 
 ```
 Route::controller(SSOController::class)->group(function () {
+    Route::get("/", 'ssoPage');
     Route::get("/sso/login", 'getLogin')->name("sso.login");
     Route::get("/callback", 'getCallback')->name("sso.callback");
     Route::get("/sso/connect", 'connectUser')->name("sso.connect");

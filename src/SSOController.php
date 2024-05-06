@@ -28,6 +28,11 @@ class SSOController extends Controller
         }
     }
 
+    public function ssoPage()
+    {
+        return redirect($this->getConfig('serverUrl'));
+    }
+
     public function getLogin(Request $request)
     {
         $request->session()->put("state", $state = Str::random(40));
