@@ -63,6 +63,7 @@ Schema::create('users', function (Blueprint $table) {
     $table->string('name');
     $table->string('username')->unique();
     $table->string('phone')->unique();
+    $table->char('prodi', 5)->nullable();
     $table->bigInteger('oauth_client_role_id');
     $table->timestamp('email_verified_at')->nullable();
     $table->rememberToken();

@@ -88,11 +88,13 @@ class SSOController extends Controller
         $client = array_filter($userArray['oauth_client_users'], function ($item) {
             return $item['oauth_client_role']['oauth_client']['id'] === $this->getConfig('clientId');
         });
+
         if (!$user) {
             $user = new User;
             $user->name = $userArray['name'];
             $user->username = $userArray['username'];
             $user->phone = $userArray['phone'];
+            $user->prodi = $userArray['prodi'];
             $user->email_verified_at = $userArray['email_verified_at'];
             $user->oauth_client_role_id = reset($client)['oauth_client_role_id'];
             $user->save();
@@ -100,9 +102,9 @@ class SSOController extends Controller
             $user->update([
                 'name' => $userArray['name'],
                 'phone' => $userArray['phone'],
+                'prodi' => $userArray['prodi'],
                 'oauth_client_role_id' => reset($client)['oauth_client_role_id'],
-            ]);
-        }
+            ])
 
         Auth::login($user);
 
@@ -170,6 +172,7 @@ class SSOController extends Controller
                 'name' => $userArray['name'],
                 'username' => $userArray['username'],
                 'phone' => $userArray['phone'],
+                'prodi' => $userArray['prodi'],
                 'password' => bcrypt($userArray['username']),
                 'is_client' => 1,
                 'is_active' => 1,
@@ -218,6 +221,7 @@ class SSOController extends Controller
                 'name' => $userArray['name'],
                 'username' => $userArray['username'],
                 'phone' => $userArray['phone'],
+                'prodi' => $userArray['prodi'],
             ]);
 
         return $response->successful();
