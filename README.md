@@ -1,12 +1,8 @@
 # Client Usage Config
 
-# Installation
+# Configuration
 
-```
-composer require rizalrepo/sso-client:dev-master
-```
-
--   then publish SSOController with run command
+publish SSOController with run command
 
 ```
 php artisan vendor:publish --tag=sso-config
