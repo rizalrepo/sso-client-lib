@@ -207,17 +207,17 @@ class SSOController extends Controller
 
         $existingUser = $this->getExistingUser($userArray['old_username'], $headers, $serverUrl);
         if ($existingUser) {
-            $this->updateExistingUser($userArray['old_username'], $userArray, $headers, $serverUrl);
+            $this->updateExistingUser($userArray['old_username'], $userArray['username'], $userArray, $headers, $serverUrl);
             return true;
         }
 
         return false;
     }
 
-    private function updateExistingUser($username, $userArray, $headers, $serverUrl)
+    private function updateExistingUser($username, $newUsername, $userArray, $headers, $serverUrl)
     {
         $response = Http::withHeaders($headers)
-            ->put($serverUrl . '/api/user/' . $username, [
+            ->put($serverUrl . '/api/user/' . $username . '/' . $newUsername, [
                 'name' => $userArray['name'],
                 'username' => $userArray['username'],
                 'phone' => $userArray['phone'],
