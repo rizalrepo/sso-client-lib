@@ -1,5 +1,10 @@
 # Client Usage Config
 
+#installation
+```
+composer require rizalrepo/sso-client
+```
+
 # Configuration
 
 publish SSOController with run command
