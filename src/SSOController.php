@@ -227,6 +227,30 @@ class SSOController extends Controller
         return $response->successful();
     }
 
+    public function updateUserActiveOnServer($userArray)
+    {
+        $accessToken = session()->get('access_token');
+        $serverUrl = $this->getConfig('serverUrl');
+        $headers = [
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . $accessToken,
+        ];
+
+        // Mengambil data user yang ada berdasarkan username
+        $existingUser = $this->getExistingUser($userArray['username'], $headers, $serverUrl);
+        if ($existingUser) {
+            // Memperbarui status aktif user
+            $response = Http::withHeaders($headers)
+                ->put($serverUrl . '/api/user/active/' . $userArray['username'], [
+                    'is_active' => $userArray['is_active']
+                ]);
+
+            return $response->successful();
+        }
+
+        return false;
+    }
+
     public function deleteUserOnServer($userName)
     {
         $accessToken = session()->get('access_token');
