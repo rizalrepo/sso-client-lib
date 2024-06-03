@@ -238,10 +238,11 @@ class SSOController extends Controller
 
         // Mengambil data user yang ada berdasarkan username
         $existingUser = $this->getExistingUser($userArray['username'], $headers, $serverUrl);
+
         if ($existingUser) {
             // Memperbarui status aktif user
             $response = Http::withHeaders($headers)
-                ->put($serverUrl . '/api/user/active/' . $userArray['username'], [
+                ->post($serverUrl . '/api/user/actived/' . $userArray['username'], [
                     'is_active' => $userArray['is_active']
                 ]);
 
