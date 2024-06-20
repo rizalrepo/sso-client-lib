@@ -128,6 +128,11 @@ class SSOController extends Controller
         return redirect($this->getConfig('serverUrl') . "/edit-password");
     }
 
+    public function editProfile()
+    {
+        return redirect($this->getConfig('serverUrl') . "/profile");
+    }
+
     public function createUserOnServer($userArray)
     {
         $accessToken = session()->get('access_token');
@@ -175,7 +180,7 @@ class SSOController extends Controller
                 'prodi' => $userArray['prodi'],
                 'password' => bcrypt($userArray['username']),
                 'is_client' => 1,
-                'is_active' => 1,
+                'is_active' => $userArray['is_active'] ?? 1,
             ]);
 
         if ($response->successful()) {

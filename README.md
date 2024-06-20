@@ -1,6 +1,7 @@
 # Client Usage Config
 
 #installation
+
 ```
 composer require rizalrepo/sso-client
 ```
@@ -50,6 +51,7 @@ Route::controller(SSOController::class)->group(function () {
         Route::get("/sso/logout", 'logout')->name("sso.logout");
         Route::get("/sso/edit-password", 'editPassword')->name("sso.edit-password");
         Route::get("/sso/portal", 'portal')->name("sso.portal");
+        Route::get("/sso/profile", 'editProfile')->name("sso.profile");
     });
 });
 ```
