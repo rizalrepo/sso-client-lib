@@ -146,7 +146,7 @@ class Authenticate extends Middleware
 
 # Views Config
 
--   use code bellow for direct url portal, edit-password and logout
+-   use code bellow for show user avatar, direct url portal, update profile, edit-password and logout
 
 ```
 {{-- in app blade --}}
@@ -158,6 +158,7 @@ class Authenticate extends Middleware
             <a class="dropdown-item" href="{{ route('sso.portal') }}">Portal</a>
         @endif
     @endif
+    <a href="{{ route('sso.profile') }}" onclick="saveReferrer()"><i class="fas fa-user-edit me-2"></i><span>Edit Profile</span></a>
     <a class="dropdown-item" href="{{ route('sso.edit-password') }}" onclick="saveReferrer()">
         Edit Password
     </a>
