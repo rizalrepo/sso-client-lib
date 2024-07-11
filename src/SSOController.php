@@ -80,8 +80,14 @@ class SSOController extends Controller
         $userArray = $response->json();
 
         $countAccess = count($userArray['oauth_client_users']);
+        $avatar = $this->getConfig('serverUrl') . '/storage/fotos/' . $userArray['foto'];
 
-        $request->session()->put('countAccess', $countAccess);
+        $request->session()->put(
+            [
+                'countAccess' => $countAccess,
+                'avatar' => $avatar
+            ]
+        );
 
         $user = User::where("username", $userArray['username'])->first();
 

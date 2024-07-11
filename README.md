@@ -152,6 +152,7 @@ class Authenticate extends Middleware
 {{-- in app blade --}}
 
 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+    <img class="b-r-10 avatar-image" src="{{ session('avatar') ? session('avatar') : asset('/assets/images/dashboard/profile.png')  }}" alt="Logo">
     @if(session()->has('countAccess'))
         @if (session('countAccess') > 1)
             <a class="dropdown-item" href="{{ route('sso.portal') }}">Portal</a>
