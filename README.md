@@ -14,26 +14,17 @@ publish SSOController with run command
 php artisan vendor:publish --tag=sso-config
 ```
 
-# SSOController
+# Connect with SSO
 
-open SSOController.php and adjust config with your preference
+open config/sso.php and adjust config with your preference
 
 ```
-private function getConfig($configName)
-{
-    switch ($configName) {
-        case 'callbackUrl':
-            return "http://127.0.0.1:8080/callback";
-        case 'serverUrl':
-            return "http://127.0.0.1:8000";
-        case 'clientId':
-            return "a4cf7da2-0af1-4137-9bee-498bf9ab64c5";
-        case 'clientSecret':
-            return "UzZ5LiZSEqaU4TO4fr46sS8ENPOjK0wdQ4AiyMZY";
-        default:
-            return null;
-    }
-}
+return [
+    'callbackUrl' => "http://127.0.0.1:8000/callback",
+    'serverUrl' => "http://127.0.0.1:8081",
+    'clientId' => "f9c2bbad-c06d-4028-9786-213c9113ddbb",
+    'clientSecret' => "1zJyzTcLmL05ZzMOnaMI6DfhaY9guJLCKBisH4YS",
+];
 ```
 
 # Routes
@@ -224,4 +215,62 @@ $username = $data->username; // this code add before delete()
 
 $ssoController = new \App\Http\Controllers\SSO\SSOController();
 $ssoController->deleteUserOnServer($username);
+```
+
+# Verify Api Token from Client
+
+-   create new middleware with run command :
+
+```
+php artisan make:middleware VerifyApiToken
+```
+
+-   then open file VerifyApiToken and replace with the code below
+
+```
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class VerifyApiToken
+{
+    public function handle($request, Closure $next)
+    {
+        $token = $request->bearerToken();
+
+        if (!$token) {
+            Log::warning('No bearer token provided and no access token in session');
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        try {
+            $serverUrl = Config::get('sso.serverUrl');
+            $response = Http::timeout(5)->withHeaders([
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $token,
+            ])->get($serverUrl . '/api/verify-token');
+
+            if ($response->successful()) {
+                $request->merge(['sso_user' => $response->json()]);
+                return $next($request);
+            }
+
+            return response()->json(['error' => 'Invalid token'], 401);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error verifying token'], 500);
+        }
+    }
+}
+
+```
+
+-   add middleware aliases to Kernel.php for Laravel 10 or to bootstrap/app.php for Laravel 11
+
+```
+'verify.api.token' => \App\Http\Middleware\VerifyApiToken::class,
 ```

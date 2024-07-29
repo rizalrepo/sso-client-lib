@@ -16,6 +16,7 @@ class SSOClientServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/SSOController.php' => App::path('Http/Controllers/SSO/SSOController.php'),
+            __DIR__ . '/sso.php' => App::path('config/sso.php'),
         ], 'sso-config');
     }
 
