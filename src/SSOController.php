@@ -70,8 +70,15 @@ class SSOController extends Controller
         $userArray = $response->json();
 
         $countAccess = count($userArray['oauth_client_users']);
+        $avatar = $this->getConfig('serverUrl') . '/storage/fotos/' . $userArray['foto'];
 
-        $request->session()->put('countAccess', $countAccess);
+        $request->session()->put(
+            [
+                'countAccess' => $countAccess,
+                'avatar' => $avatar,
+                'access_token' => $access_token,
+            ]
+        );
 
         $user = User::where("username", $userArray['username'])->first();
 
@@ -96,9 +103,12 @@ class SSOController extends Controller
                 'oauth_client_role_id' => reset($client)['oauth_client_role_id'],
             ]);
         }
+
         Auth::login($user);
 
-        return redirect()->route('home');
+        $redirect = redirect()->route('home');
+
+        return $redirect;
     }
 
     public function logout()
@@ -116,6 +126,11 @@ class SSOController extends Controller
     public function editPassword()
     {
         return redirect($this->getConfig('serverUrl') . "/edit-password");
+    }
+
+    public function editProfile()
+    {
+        return redirect($this->getConfig('serverUrl') . "/profile");
     }
 
     public function createUserOnServer($userArray)
@@ -165,7 +180,7 @@ class SSOController extends Controller
                 'prodi' => $userArray['prodi'],
                 'password' => bcrypt($userArray['username']),
                 'is_client' => 1,
-                'is_active' => 1,
+                'is_active' => $userArray['is_active'] ?? 1,
             ]);
 
         if ($response->successful()) {
@@ -197,17 +212,17 @@ class SSOController extends Controller
 
         $existingUser = $this->getExistingUser($userArray['old_username'], $headers, $serverUrl);
         if ($existingUser) {
-            $this->updateExistingUser($userArray['old_username'], $userArray, $headers, $serverUrl);
+            $this->updateExistingUser($userArray['old_username'], $userArray['username'], $userArray, $headers, $serverUrl);
             return true;
         }
 
         return false;
     }
 
-    private function updateExistingUser($username, $userArray, $headers, $serverUrl)
+    private function updateExistingUser($username, $newUsername, $userArray, $headers, $serverUrl)
     {
         $response = Http::withHeaders($headers)
-            ->put($serverUrl . '/api/user/' . $username, [
+            ->put($serverUrl . '/api/user/' . $username . '/' . $newUsername, [
                 'name' => $userArray['name'],
                 'username' => $userArray['username'],
                 'phone' => $userArray['phone'],
@@ -215,6 +230,31 @@ class SSOController extends Controller
             ]);
 
         return $response->successful();
+    }
+
+    public function updateUserActiveOnServer($userArray)
+    {
+        $accessToken = session()->get('access_token');
+        $serverUrl = $this->getConfig('serverUrl');
+        $headers = [
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . $accessToken,
+        ];
+
+        // Mengambil data user yang ada berdasarkan username
+        $existingUser = $this->getExistingUser($userArray['username'], $headers, $serverUrl);
+
+        if ($existingUser) {
+            // Memperbarui status aktif user
+            $response = Http::withHeaders($headers)
+                ->post($serverUrl . '/api/user/actived/' . $userArray['username'], [
+                    'is_active' => $userArray['is_active']
+                ]);
+
+            return $response->successful();
+        }
+
+        return false;
     }
 
     public function deleteUserOnServer($userName)
