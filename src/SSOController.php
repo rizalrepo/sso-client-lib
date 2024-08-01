@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -14,18 +15,7 @@ class SSOController extends Controller
 {
     private function getConfig($configName)
     {
-        switch ($configName) {
-            case 'callbackUrl':
-                return "http://127.0.0.1:8080/callback";
-            case 'serverUrl':
-                return "http://127.0.0.1:8000";
-            case 'clientId':
-                return "7996ab5b-bd12-4cd9-a279-d09430d0c5bd";
-            case 'clientSecret':
-                return "ZKnezxr7kz9kyz1b8vKYC92xsgInzPb7JmfwFICA";
-            default:
-                return null;
-        }
+        return Config::get('sso.' . $configName);
     }
 
     public function ssoPage()
