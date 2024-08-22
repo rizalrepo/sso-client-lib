@@ -70,7 +70,7 @@ class SSOController extends Controller
         $userArray = $response->json();
 
         $countAccess = count($userArray['oauth_client_users']);
-        $avatar = $this->getConfig('serverUrl') . '/storage/fotos/' . $userArray['foto'];
+        $avatar = $userArray['foto'] ? $this->getConfig('serverUrl') . $userArray['foto'] : $this->getConfig('serverUrl') . '/assets/images/dashboard/profile.png';
 
         $request->session()->put(
             [
