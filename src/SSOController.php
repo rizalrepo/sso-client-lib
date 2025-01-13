@@ -227,6 +227,7 @@ class SSOController extends Controller
                 'username' => $userArray['username'],
                 'phone' => $userArray['phone'],
                 'prodi' => $userArray['prodi'],
+                'oauth_client_role_id' => $userArray['oauth_client_role_id'],
             ]);
 
         return $response->successful();
@@ -257,7 +258,7 @@ class SSOController extends Controller
         return false;
     }
 
-    public function deleteUserOnServer($userName)
+    public function deleteUserOnServer($userData)
     {
         $accessToken = session()->get('access_token');
         $serverUrl = $this->getConfig('serverUrl');
@@ -266,16 +267,17 @@ class SSOController extends Controller
             'Authorization' => 'Bearer ' . $accessToken,
         ];
 
-        $existingUser = $this->getExistingUser($userName, $headers, $serverUrl);
+        $existingUser = $this->getExistingUser($userData['username'], $headers, $serverUrl);
         if ($existingUser) {
             $response = Http::withHeaders($headers)
-                ->delete($serverUrl . '/api/user/' . $userName);
+                ->delete($serverUrl . '/api/user/' . $userData['username'], [
+                    'oauth_client_role_id' => $userData['oauth_client_role_id']
+                ]);
 
             if ($response->successful()) {
                 return true;
-            } else {
-                return false;
             }
+            return false;
         }
 
         return false;

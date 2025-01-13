@@ -197,10 +197,14 @@ $ssoController->createUserOnServer($userArray);
 ```
 $oldUsername = $user->username; // this code add before update()
 
+// this is code for update in client then copy code below
+
 $updatedUserArray = [
     'name' => $user->name,
     'username' => $user->username,
+    'prodi' => $user->prodi,
     'phone' => $user->phone,
+    'oauth_client_role_id' => $user->oauth_client_role_id,
     'old_username' => $oldUsername,
 ];
 
@@ -211,10 +215,13 @@ $ssoController->updateUserOnServer($updatedUserArray);
 -   add this code to destroy function after user deleted
 
 ```
-$username = $data->username; // this code add before delete()
+$userData = [
+    'username' => $user->username,
+    'oauth_client_role_id' => $user->oauth_client_role_id
+];
 
 $ssoController = new \App\Http\Controllers\SSO\SSOController();
-$ssoController->deleteUserOnServer($username);
+$ssoController->deleteUserOnServer($userData);
 ```
 
 # Verify Api Token from Client
