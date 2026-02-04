@@ -2,9 +2,9 @@
 
 ## Patch - Role selection, prodi sync, config env
 
-- **Added**: Session `last_sso_profile_refresh` di connectUser untuk mendukung middleware refresh profil di client.
-- **Changed**: Role selection dari portal (session/query role_id) dengan fallback; prodi sync dengan logging [PRODI_SYNC]; config sso dari env (SSO_URL, SSO_CLIENT_ID, dll.).
-- **Fixed**: connectUser memakai oauth_client_role_id dari role yang dipilih; tambah use Log.
+-   **Added**: Session `last_sso_profile_refresh` di connectUser untuk mendukung middleware refresh profil di client.
+-   **Changed**: Role selection dari portal (session/query role_id) dengan fallback; prodi sync dengan logging [PRODI_SYNC]; config sso dari env (SSO_URL, SSO_CLIENT_ID, dll.).
+-   **Fixed**: connectUser memakai oauth_client_role_id dari role yang dipilih; tambah use Log.
 
 ---
 
