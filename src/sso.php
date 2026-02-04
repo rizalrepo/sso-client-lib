@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'callbackUrl' => "http://127.0.0.1:8000/callback",
-    'serverUrl' => "http://127.0.0.1:8081",
-    'clientId' => "f9c2bbad-c06d-4028-9786-213c9113ddbb",
-    'clientSecret' => "1zJyzTcLmL05ZzMOnaMI6DfhaY9guJLCKBisH4YS",
+    'callbackUrl' => env('SSO_CALLBACK_URL', env('APP_URL') . '/callback'),
+    'serverUrl' => env('SSO_URL', 'https://sso-dev.unism.ac.id'),
+    'clientId' => env('SSO_CLIENT_ID'),
+    'clientSecret' => env('SSO_CLIENT_SECRET'),
 ];

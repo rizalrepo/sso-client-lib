@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -77,31 +78,90 @@ class SSOController extends Controller
                 'countAccess' => $countAccess,
                 'avatar' => $avatar,
                 'access_token' => $access_token,
+                'last_sso_profile_refresh' => time(),
             ]
         );
 
         $user = User::where("username", $userArray['username'])->first();
 
+        // Filter oauth_client_users berdasarkan clientId yang sesuai
         $client = array_filter($userArray['oauth_client_users'], function ($item) {
             return $item['oauth_client_role']['oauth_client']['id'] === $this->getConfig('clientId');
         });
+
+        // Baca role_id dari session (disimpan saat getLogin) atau dari query parameter
+        $selectedRoleId = $request->session()->pull('selected_role_id') ?? $request->query('role_id');
+        $oauthClientRoleId = null;
+
+        if ($selectedRoleId) {
+            // Cari oauth_client_role_id yang sesuai dengan role_id yang dipilih
+            $selectedClient = array_filter($client, function ($item) use ($selectedRoleId) {
+                // Cek apakah oauth_client_role['id'] sesuai dengan selectedRoleId
+                return isset($item['oauth_client_role']['id']) && $item['oauth_client_role']['id'] == $selectedRoleId;
+            });
+
+            if (!empty($selectedClient)) {
+                $selectedItem = reset($selectedClient);
+                // Coba ambil oauth_client_role_id langsung, jika tidak ada gunakan nested structure
+                $oauthClientRoleId = $selectedItem['oauth_client_role_id'] ?? $selectedItem['oauth_client_role']['id'] ?? null;
+            }
+        }
+
+        // Fallback: jika role_id tidak valid atau tidak ada, ambil yang pertama
+        if (!$oauthClientRoleId && !empty($client)) {
+            $firstItem = reset($client);
+            // Coba ambil oauth_client_role_id langsung, jika tidak ada gunakan nested structure
+            $oauthClientRoleId = $firstItem['oauth_client_role_id'] ?? $firstItem['oauth_client_role']['id'] ?? null;
+        }
 
         if (!$user) {
             $user = new User;
             $user->name = $userArray['name'];
             $user->username = $userArray['username'];
             $user->phone = $userArray['phone'];
-            $user->prodi = $userArray['prodi'];
+            $user->prodi = !empty($userArray['prodi']) ? $userArray['prodi'] : null;
             $user->email_verified_at = $userArray['email_verified_at'];
-            $user->oauth_client_role_id = reset($client)['oauth_client_role_id'];
+            $user->oauth_client_role_id = $oauthClientRoleId;
             $user->save();
+
+            // Log new user creation with prodi info
+            if (empty($userArray['prodi'])) {
+                Log::warning('[PRODI_SYNC] New user created without prodi', [
+                    'username' => $userArray['username'],
+                ]);
+            }
         } else {
-            $user->update([
+            $oldProdi = $user->prodi;
+            $newProdi = $userArray['prodi'];
+
+            // Build update data - always update name, phone, role
+            $updateData = [
                 'name' => $userArray['name'],
                 'phone' => $userArray['phone'],
-                'prodi' => $userArray['prodi'],
-                'oauth_client_role_id' => reset($client)['oauth_client_role_id'],
-            ]);
+                'oauth_client_role_id' => $oauthClientRoleId,
+            ];
+
+            // Handle prodi sync with logging
+            if (empty($newProdi)) {
+                // SSO returned null/empty prodi - keep existing, log warning
+                Log::warning('[PRODI_SYNC] SSO returned empty prodi, keeping existing', [
+                    'username' => $userArray['username'],
+                    'existing_prodi' => $oldProdi,
+                ]);
+            } elseif ($oldProdi !== $newProdi) {
+                // Prodi changed - update and log
+                $updateData['prodi'] = $newProdi;
+                Log::info('[PRODI_SYNC] Prodi changed', [
+                    'username' => $userArray['username'],
+                    'old' => $oldProdi,
+                    'new' => $newProdi,
+                ]);
+            } else {
+                // Prodi unchanged - still include in update (no change, no log needed)
+                $updateData['prodi'] = $newProdi;
+            }
+
+            $user->update($updateData);
         }
 
         Auth::login($user);
