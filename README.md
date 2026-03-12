@@ -1,6 +1,6 @@
 # Client Usage Config
 
-**Current release:** [v1.3.2](md/RELEASE_NOTES_v1.3.2.md) – Role selection, prodi sync, config env. [Changelog](md/CHANGELOG.md)
+**Current release:** [v1.3.3](md/RELEASE_NOTES_v1.3.3.md) – OAuth hardening, avatar, role-based redirect. [Changelog](md/CHANGELOG.md)
 
 #installation
 

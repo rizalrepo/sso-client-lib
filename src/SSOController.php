@@ -28,6 +28,11 @@ class SSOController extends Controller
     {
         $request->session()->put("state", $state = Str::random(40));
 
+        // Simpan role_id ke session jika ada (dari pilihan user di portal)
+        if ($request->has('role_id')) {
+            $request->session()->put("selected_role_id", $request->query('role_id'));
+        }
+
         $query = http_build_query([
             "client_id" => $this->getConfig('clientId'),
             "redirect_uri" => $this->getConfig('callbackUrl'),
@@ -43,7 +48,12 @@ class SSOController extends Controller
     {
         $state = $request->session()->pull("state");
 
-        throw_unless(strlen($state) > 0 && $state == $request->state, InvalidArgumentException::class);
+        // Validasi state parameter untuk keamanan OAuth
+        if (empty($state) || $state !== $request->state) {
+            return redirect()->route('sso.login')->withErrors([
+                'message' => 'Invalid state parameter. Silakan coba login kembali.'
+            ]);
+        }
 
         $response = Http::asForm()->post(
             $this->getConfig('serverUrl') . "/oauth/token",
@@ -56,7 +66,28 @@ class SSOController extends Controller
             ]
         );
 
-        $request->session()->put($response->json());
+        // [V-SEC-19 FIX] Validasi response token — cegah bypass via session lama
+        $tokenData = $response->json();
+
+        if ($response->failed() || ! isset($tokenData['access_token'])) {
+            Log::error('[SSO] Token exchange failed', [
+                'status' => $response->status(),
+                'error' => $tokenData['error'] ?? 'unknown',
+                'error_description' => $tokenData['error_description'] ?? '',
+            ]);
+
+            // Bersihkan token lama dari session agar tidak bisa dipakai ulang
+            $request->session()->forget(['access_token', 'refresh_token', 'token_type', 'expires_in']);
+
+            return redirect()->route('sso.login')->withErrors([
+                'message' => 'Gagal autentikasi dengan SSO. Silakan coba login kembali.'
+            ]);
+        }
+
+        // Bersihkan token lama DULU, lalu simpan yang baru
+        $request->session()->forget(['access_token', 'refresh_token', 'token_type', 'expires_in']);
+        $request->session()->put($tokenData);
+
         return redirect()->route("sso.connect");
     }
 
@@ -71,7 +102,8 @@ class SSOController extends Controller
         $userArray = $response->json();
 
         $countAccess = count($userArray['oauth_client_users']);
-        $avatar = $userArray['foto'] ? $this->getConfig('serverUrl') . $userArray['foto'] : $this->getConfig('serverUrl') . '/assets/images/dashboard/profile.png';
+        $avatar = $userArray['avatar_url']
+            ?? ($this->getConfig('serverUrl') . '/assets/images/dashboard/profile.png');
 
         $request->session()->put(
             [
