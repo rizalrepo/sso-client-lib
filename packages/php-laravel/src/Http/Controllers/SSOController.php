@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\SSO;
+namespace Rizalrepo\SsoClient\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
@@ -32,6 +31,11 @@ class SSOController extends Controller
     private function ok(int $status): bool
     {
         return $status >= 200 && $status < 300;
+    }
+
+    private function userModel(): string
+    {
+        return config('sso.user_model', \App\Models\User::class);
     }
 
     public function ssoPage()
@@ -95,10 +99,11 @@ class SSOController extends Controller
         $selectedRoleId = $request->session()->pull('selected_role_id') ?? $request->query('role_id');
         $oauthClientRoleId = $sso->resolveClientRoleId($userArray, $selectedRoleId);
 
-        $user = User::where('username', $userArray['username'])->first();
+        $userClass = $this->userModel();
+        $user = $userClass::where('username', $userArray['username'])->first();
 
         if (!$user) {
-            $user = new User;
+            $user = new $userClass;
             $user->name = $userArray['name'];
             $user->username = $userArray['username'];
             $user->phone = $userArray['phone'];

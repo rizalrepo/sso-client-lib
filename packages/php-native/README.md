@@ -1,9 +1,9 @@
-# `rizalrepo/sso-client-core`
+# `rizalrepo/sso-client` (PHP native)
 
-PHP OAuth2 client without a framework (CodeIgniter, Slim, plain PHP).
+PHP OAuth2 client without a framework (CodeIgniter, Slim, plain PHP). Same package as Laravel — ServiceProvider is ignored outside Laravel.
 
 ```bash
-composer require rizalrepo/sso-client-core:^2.0
+composer require rizalrepo/sso-client:^2.1
 ```
 
 ```php

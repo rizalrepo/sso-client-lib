@@ -2,6 +2,20 @@
 
 All notable changes are documented here. Format: [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.1.0] - 2026-07-08
+
+### Added
+
+- Laravel: auto-register SSO routes & config via `SSOClientServiceProvider` — satu perintah `composer require`.
+- Config keys: `user_model`, `register_routes`.
+- Optional publish: stub `App\Http\Controllers\SSO\SSOController` extends package controller.
+
+### Changed
+
+- Unified package: `SSOClient` (native) + Laravel integration in satu `rizalrepo/sso-client`.
+- Controller dipindah ke `Rizalrepo\SsoClient\Http\Controllers\SSOController`.
+- Removed dependency `rizalrepo/sso-client-core` (merged into root autoload).
+
 ## [2.0.2] - 2026-07-08
 
 ### Changed

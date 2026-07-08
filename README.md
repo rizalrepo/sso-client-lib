@@ -1,12 +1,11 @@
 # UNISM SSO Client SDK
 
-**v2.0.2** · [Changelog](md/CHANGELOG.md) · [Integration guide](docs/INTEGRATION.md)
+**v2.1.0** · [Changelog](md/CHANGELOG.md) · [Integration guide](docs/INTEGRATION.md)
 
 | Runtime | Package | Install |
 |---------|---------|---------|
 | JavaScript / TypeScript | `@rizalrepo/sso-client` | `npm install @rizalrepo/sso-client` |
-| PHP / Laravel | `rizalrepo/sso-client` | `composer require rizalrepo/sso-client:^2.0` |
-| PHP (native) | `rizalrepo/sso-client-core` | `composer require rizalrepo/sso-client-core:^2.0` |
+| PHP (native or Laravel) | `rizalrepo/sso-client` | `composer require rizalrepo/sso-client:^2.1` |
 | Other languages | Live OpenAPI | `{SSO_URL}/developer/openapi.yaml` |
 
 ```env
@@ -24,7 +23,7 @@ const token = await sso.exchangeCodeForToken(code);
 const user = await sso.getUser(token.access_token);
 ```
 
-Laravel: `php artisan vendor:publish --tag=sso-config`
+Laravel: satu perintah `composer require` — routes & config otomatis. Publish opsional: `php artisan vendor:publish --tag=sso-config`
 
 ## UI integration (avatar, username, edit profile/password)
 

@@ -1,29 +1,64 @@
 # `rizalrepo/sso-client` (Laravel)
 
+## Satu perintah
+
 ```bash
-composer require rizalrepo/sso-client:^2.0
+composer require rizalrepo/sso-client:^2.1
+```
+
+Setelah install, Laravel **otomatis** mendaftarkan:
+
+- **Config** `sso.*` (via `mergeConfigFrom`)
+- **Routes** SSO (`/sso/login`, `/callback`, `/sso/connect`, dll.)
+
+Tambahkan env di `.env`:
+
+```env
+SSO_URL=https://sirisa.unism.ac.id
+SSO_CLIENT_ID=your-uuid
+SSO_CLIENT_SECRET=your-secret
+SSO_CALLBACK_URL=https://your-app.example.com/callback
+```
+
+Pastikan route `home` ada (redirect setelah login).
+
+## Kustomisasi (opsional)
+
+Publish hanya jika perlu override config atau controller:
+
+```bash
 php artisan vendor:publish --tag=sso-config
 ```
 
-## Routes (`routes/web.php`)
+| File | Fungsi |
+|------|--------|
+| `config/sso.php` | Override env defaults |
+| `app/Http/Controllers/SSO/SSOController.php` | Extend package controller |
 
-```php
-use App\Http\Controllers\SSO\SSOController;
+Nonaktifkan auto-routes jika pakai controller/routes sendiri:
 
-Route::controller(SSOController::class)->group(function () {
-    Route::get('/', 'ssoPage');
-    Route::get('/sso/login', 'getLogin')->name('sso.login');
-    Route::get('/callback', 'getCallback')->name('sso.callback');
-    Route::get('/sso/connect', 'connectUser')->name('sso.connect');
-
-    Route::middleware('auth')->group(function () {
-        Route::get('/sso/logout', 'logout')->name('sso.logout');
-        Route::get('/sso/portal', 'portal')->name('sso.portal');
-        Route::get('/sso/profile', 'editProfile')->name('sso.profile');
-        Route::get('/sso/edit-password', 'editPassword')->name('sso.edit-password');
-    });
-});
+```env
+SSO_REGISTER_ROUTES=false
 ```
+
+Model user custom:
+
+```env
+SSO_USER_MODEL=App\Models\CustomUser
+```
+
+## Routes (otomatis terdaftar)
+
+| Method | URI | Name |
+|--------|-----|------|
+| GET | `/` | — |
+| GET | `/sso/login` | `sso.login` |
+| GET | `/callback` | `sso.callback` |
+| GET | `/sso/connect` | `sso.connect` |
+| GET | `/sso/logout` | `sso.logout` (auth) |
+| GET | `/sso/portal` | `sso.portal` (auth) |
+| GET | `/sso/profile` | `sso.profile` (auth) |
+| GET | `/sso/edit-password` | `sso.edit-password` (auth) |
 
 ## Data available in views
 
@@ -94,10 +129,11 @@ $table->bigInteger('oauth_client_role_id');
 After local CRUD in `UserController`:
 
 ```php
-$sso = new \App\Http\Controllers\SSO\SSOController();
-$sso->createUserOnServer([...]);
-$sso->updateUserOnServer([...]);
-$sso->deleteUserOnServer([...]);
+use Rizalrepo\SsoClient\Http\Controllers\SSOController;
+
+app(SSOController::class)->createUserOnServer([...]);
+app(SSOController::class)->updateUserOnServer([...]);
+app(SSOController::class)->deleteUserOnServer([...]);
 ```
 
 See [INTEGRATION.md](../../docs/INTEGRATION.md) · [root README](../../README.md)
