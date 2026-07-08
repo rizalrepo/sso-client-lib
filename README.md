@@ -24,4 +24,12 @@ const token = await sso.exchangeCodeForToken(code);
 const user = await sso.getUser(token.access_token);
 ```
 
-Laravel: `php artisan vendor:publish --tag=sso-config` — see [packages/php-laravel/README.md](packages/php-laravel/README.md).
+Laravel: `php artisan vendor:publish --tag=sso-config`
+
+## UI integration (avatar, username, edit profile/password)
+
+| Runtime | Guide |
+|---------|-------|
+| Laravel (Blade) | [packages/php-laravel/README.md](packages/php-laravel/README.md) |
+| PHP native (HTML) | [packages/php-native/README.md](packages/php-native/README.md) |
+| JavaScript (Express/React) | [packages/javascript/README.md](packages/javascript/README.md) |

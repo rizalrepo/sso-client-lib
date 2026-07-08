@@ -6,7 +6,11 @@ export interface SSOConfig {
 }
 
 export interface SSOUser {
+	name: string;
 	username: string;
+	phone?: string;
+	email?: string;
+	prodi?: string;
 	avatar_url?: string;
 	oauth_client_users: Array<{
 		oauth_client_role_id?: number;
