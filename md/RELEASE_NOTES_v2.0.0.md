@@ -1,57 +1,59 @@
 # Release Notes v2.0.0
 
-**Release Date:** 8 Juli 2026  
-**Type:** Major Release  
-**Previous Version:** 1.3.3
+**Release date:** July 8, 2026  
+**Type:** Major release  
+**Previous version:** 1.3.3
 
-## Ringkasan
+## Summary
 
-Release ini mengubah `sso-client-lib` menjadi **monorepo multi-bahasa** untuk integrasi client ke UNISM SSO. Selain package Laravel yang sudah ada, kini tersedia SDK JavaScript/TypeScript, PHP native, OpenAPI spec, dan panduan integrasi universal.
+This release transforms `sso-client-lib` into a **multi-language monorepo** for UNISM SSO client integration. In addition to the existing Laravel package, it adds JavaScript/TypeScript and native PHP SDKs, an OpenAPI specification, and a universal integration guide.
 
-## Package Baru
+## New packages
 
 | Package | Install |
 |---------|---------|
 | `@rizalrepo/sso-client` | `npm install @rizalrepo/sso-client` |
 | `rizalrepo/sso-client-core` | `composer require rizalrepo/sso-client-core` |
-| `rizalrepo/sso-client` (Laravel) | `composer require rizalrepo/sso-client` |
+| `rizalrepo/sso-client` (Laravel) | `composer require rizalrepo/sso-client:^2.0` |
 
-## Perubahan
+## Changes
 
 ### Added
 
-- **JavaScript/TypeScript SDK** (`packages/javascript`) — OAuth2 + API, zero runtime dependency (`fetch`).
-- **PHP native SDK** (`packages/php-native`) — class `SSOClient` tanpa Laravel (ext-curl).
-- **OpenAPI spec** (`spec/openapi.yaml`) — generate client Go, Python, Java, dll.
-- **Integration guide** (`docs/INTEGRATION.md`) — panduan OAuth untuk semua bahasa.
-- **README** diperbarui dengan quick install semua bahasa + install dari monorepo lokal.
+- **JavaScript/TypeScript SDK** (`packages/javascript`) — OAuth 2.0 + API client, zero runtime dependencies.
+- **Native PHP SDK** (`packages/php-native`) — `SSOClient` class without Laravel (`ext-curl`).
+- **OpenAPI spec** (`spec/openapi.yaml`) — generate clients for Go, Python, Java, etc.
+- **Integration guide** (`docs/INTEGRATION.md`) — language-agnostic OAuth documentation.
+- **Updated README** with quick-install instructions for all supported languages.
 
 ### Changed
 
-- **BREAKING**: Struktur repo monorepo; PHP Laravel source pindah ke `packages/php-laravel/src/`.
-- Namespace `SSOClientServiceProvider` diperbaiki: `Rizalrepo\SsoClient` (PSR-4).
-- PHP minimum `^8.1`; `illuminate/support` dan `illuminate/http` dideklarasikan eksplisit.
+- **BREAKING:** Monorepo structure; Laravel source moved to `packages/php-laravel/src/`.
+- Fixed `SSOClientServiceProvider` namespace to `Rizalrepo\SsoClient` (PSR-4).
+- PHP minimum version raised to `^8.1`; `illuminate/support` and `illuminate/http` declared explicitly.
 
 ### Notes
 
-- `composer require rizalrepo/sso-client` tetap kompatibel (autoload root `composer.json`).
-- `rizalrepo/sso-client-core` adalah package Composer terpisah untuk PHP native.
+- `composer require rizalrepo/sso-client` remains compatible via root `composer.json` autoload.
+- `rizalrepo/sso-client-core` is a separate Composer package for native PHP.
 
-## Upgrade Laravel
+## Upgrading (Laravel)
 
 ```bash
 composer update rizalrepo/sso-client
 php artisan vendor:publish --tag=sso-config --force
 ```
 
-Jika sebelumnya memodifikasi `SSOController` manual di client, bandingkan dengan versi baru setelah publish.
+If you previously customized `SSOController` manually, compare it with the newly published version after upgrade.
 
-## Publish
+## Publishing status
 
-- **Packagist**: `rizalrepo/sso-client` — sync otomatis dari tag GitHub
-- **Packagist**: `rizalrepo/sso-client-core` — daftar package terpisah di [packagist.org](https://packagist.org) dengan path `packages/php-native/composer.json`
-- **npm**: `@rizalrepo/sso-client` — publish dari `packages/javascript`
+| Registry | Package | Status |
+|----------|---------|--------|
+| Packagist | `rizalrepo/sso-client` | Available at v2.0.0 |
+| Packagist | `rizalrepo/sso-client-core` | Requires separate registration |
+| npm | `@rizalrepo/sso-client` | Run `npm publish` from `packages/javascript` |
 
 ---
 
-**Full Changelog:** https://github.com/rizalrepo/sso-client-lib/compare/v1.3.3...v2.0.0
+**Full changelog:** https://github.com/rizalrepo/sso-client-lib/compare/v1.3.3...v2.0.0

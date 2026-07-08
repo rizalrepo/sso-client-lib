@@ -1,28 +1,28 @@
 # Changelog - SSO Client Lib
 
-Semua perubahan penting pada package ini didokumentasikan di file ini.
+All notable changes to this project are documented in this file.
 
-Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-dan project ini mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [2.0.0] - 2026-07-08
 
 ### Added
 
 - **Multi-language monorepo**: `packages/javascript`, `packages/php-laravel`, `packages/php-native`.
-- **OpenAPI spec**: `spec/openapi.yaml` untuk generate client bahasa lain.
-- **Integration guide**: `docs/INTEGRATION.md` — panduan OAuth universal.
+- **OpenAPI spec**: `spec/openapi.yaml` for generating clients in other languages.
+- **Integration guide**: `docs/INTEGRATION.md` — universal OAuth documentation.
 
 ### Changed
 
-- **BREAKING**: Struktur repo monorepo; PHP source pindah ke `packages/php-laravel/src/`.
-- Namespace `SSOClientServiceProvider` diperbaiki ke `Rizalrepo\SsoClient`.
-- PHP minimum `^8.1`; `illuminate/support` dan `illuminate/http` dideklarasikan eksplisit.
+- **BREAKING**: Monorepo structure; PHP Laravel source moved to `packages/php-laravel/src/`.
+- Fixed `SSOClientServiceProvider` namespace to `Rizalrepo\SsoClient`.
+- PHP minimum `^8.1`; `illuminate/support` and `illuminate/http` declared explicitly.
 
 ### Notes
 
-- `composer require rizalrepo/sso-client` tetap kompatibel (autoload root `composer.json`).
-- Lihat [md/MULTI_LANGUAGE_SDK.md](MULTI_LANGUAGE_SDK.md) untuk detail migrasi.
+- `composer require rizalrepo/sso-client` remains compatible (root `composer.json` autoload).
+- See [md/MULTI_LANGUAGE_SDK.md](MULTI_LANGUAGE_SDK.md) for migration details.
 
 **Diff:** https://github.com/rizalrepo/sso-client-lib/compare/v1.3.3...v2.0.0
 

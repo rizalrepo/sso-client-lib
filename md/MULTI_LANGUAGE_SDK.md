@@ -1,18 +1,20 @@
 # Multi-Language SDK — sso-client-lib v2.0
 
-**Tanggal:** 2026-07-08
+**Date:** 2026-07-08
 
-## Ringkasan
+## Summary
 
-`sso-client-lib` direstrukturisasi dari package PHP-only menjadi **monorepo multi-bahasa** untuk integrasi client ke `unism-sso`.
+`sso-client-lib` was restructured from a PHP-only Laravel package into a **multi-language monorepo** for integrating client applications with `unism-sso`.
 
-Satu file library tidak bisa dipakai di semua bahasa. Solusinya:
+A single library file cannot run in every programming language. The solution is:
 
-1. **Kontrak HTTP** — `spec/openapi.yaml` (API `/api/*`)
-2. **Panduan OAuth universal** — `docs/INTEGRATION.md` (flow `/oauth/*`)
-3. **SDK per bahasa** — implementasi tipis di atas HTTP standar
+1. **HTTP contract** — `spec/openapi.yaml` (covers `/api/*` endpoints)
+2. **Universal OAuth guide** — `docs/INTEGRATION.md` (covers `/oauth/*` flow)
+3. **Per-language SDKs** — thin HTTP clients built on standard OAuth 2.0
 
-## Struktur Baru
+---
+
+## Repository structure
 
 ```
 sso-client-lib/
@@ -20,36 +22,49 @@ sso-client-lib/
 ├── docs/INTEGRATION.md
 ├── packages/
 │   ├── javascript/     → @rizalrepo/sso-client (npm)
-│   └── php-laravel/    → rizalrepo/sso-client (Composer)
-└── composer.json       → backward compat untuk Composer
+│   ├── php-laravel/    → rizalrepo/sso-client (Composer)
+│   └── php-native/     → rizalrepo/sso-client-core (Composer)
+└── composer.json       → backward-compatible root package
 ```
 
-## Package Tersedia
+---
 
-| Bahasa | Package | Status |
-|--------|---------|--------|
-| JavaScript/TypeScript | `@rizalrepo/sso-client` | **Baru v2.0** — Node 18+, Bun, Deno, browser |
-| PHP native | `rizalrepo/sso-client-core` | **Baru v2.0** — tanpa framework (curl) |
-| PHP/Laravel | `rizalrepo/sso-client` | **Tetap** — path pindah ke `packages/php-laravel/` |
-| Lainnya (Go, Python, Java, …) | Generate dari OpenAPI | Ikuti `docs/INTEGRATION.md` |
+## Available packages
 
-## Breaking Changes v2.0
+| Language | Package | Status |
+|----------|---------|--------|
+| JavaScript / TypeScript | `@rizalrepo/sso-client` | **New in v2.0** — Node 18+, Bun, Deno, browser |
+| PHP (native) | `rizalrepo/sso-client-core` | **New in v2.0** — no framework (`ext-curl`) |
+| PHP / Laravel | `rizalrepo/sso-client` | **Maintained** — moved to `packages/php-laravel/` |
+| Go, Python, Java, … | Generated from OpenAPI | Follow `docs/INTEGRATION.md` |
 
-- Struktur folder berubah; `composer require rizalrepo/sso-client` tetap jalan (autoload dari `packages/php-laravel/src/`)
-- Namespace `SSOClientServiceProvider` diperbaiki: `Rizalrepo\SsoClient` (PSR-4)
-- PHP minimum: `^8.1` + illuminate/support & http eksplisit
+---
 
-## Fitur JavaScript SDK
+## Breaking changes in v2.0
 
-- `generateState()`, `getAuthorizeUrl()`, `exchangeCodeForToken()`
-- `getUser()`, `verifyToken()`, `verifyTokenFull()`
-- `handleCallback()`, `resolveClientRoleId()`
-- User CRUD API (`createUser`, `assignClientRole`, dll.)
-- Zero runtime dependency (native `fetch`)
+| Change | Impact |
+|--------|--------|
+| Monorepo folder structure | Direct imports from `src/` no longer valid |
+| Namespace fix | `Rizalrepo\SsoClient` (PSR-4 compliant) |
+| PHP minimum version | `^8.1` (was `^7.4`) |
+| Explicit Laravel deps | `illuminate/support` and `illuminate/http` declared |
 
-## Migrasi dari unism-presensi
+`composer require rizalrepo/sso-client` continues to work via the root `composer.json` autoload path.
 
-Ganti `ssoService.ts` lokal dengan:
+---
+
+## JavaScript SDK features
+
+- OAuth: `generateState()`, `getAuthorizeUrl()`, `exchangeCodeForToken()`, `handleCallback()`
+- User: `getUser()`, `verifyToken()`, `verifyTokenFull()`, `resolveClientRoleId()`
+- User management: `createUser()`, `assignClientRole()`, `updateUser()`, `deleteUser()`
+- Zero runtime dependencies (native `fetch`)
+
+---
+
+## Migrating from a local `ssoService.ts`
+
+Replace project-local implementations (e.g. in `unism-presensi`) with the published package:
 
 ```bash
 npm install @rizalrepo/sso-client
@@ -57,13 +72,16 @@ npm install @rizalrepo/sso-client
 
 ```typescript
 import { SSOClient } from "@rizalrepo/sso-client";
+
 const sso = new SSOClient({ serverUrl, clientId, clientSecret, callbackUrl });
 ```
 
-## Bahasa lain
+---
+
+## Other languages
 
 ```bash
 openapi-generator-cli generate -i spec/openapi.yaml -g python -o clients/python
 ```
 
-OAuth flow manual: lihat `docs/INTEGRATION.md` Step 1–2.
+Implement OAuth Steps 1–2 manually per [docs/INTEGRATION.md](../docs/INTEGRATION.md).
