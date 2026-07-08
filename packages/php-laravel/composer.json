@@ -1,13 +1,9 @@
 {
     "name": "rizalrepo/sso-client",
-    "description": "UNISM SSO Client SDK — multi-language monorepo (Laravel + JavaScript + OpenAPI spec)",
+    "description": "UNISM SSO Client — Laravel OAuth 2.0 integration",
     "version": "2.0.0",
     "type": "laravel-package",
     "homepage": "https://github.com/rizalrepo/sso-client-lib",
-    "support": {
-        "issues": "https://github.com/rizalrepo/sso-client-lib/issues",
-        "source": "https://github.com/rizalrepo/sso-client-lib"
-    },
     "require": {
         "php": "^8.1",
         "illuminate/support": "^10.0|^11.0|^12.0",
@@ -16,7 +12,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Rizalrepo\\SsoClient\\": "packages/php-laravel/src/"
+            "Rizalrepo\\SsoClient\\": "src/"
         }
     },
     "authors": [

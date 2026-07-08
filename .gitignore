@@ -1,2 +1,6 @@
 /vendor/
+packages/*/vendor/
+packages/javascript/node_modules/
+node_modules/
+dist/
 .cursor/

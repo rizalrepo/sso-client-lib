@@ -1,6 +1,6 @@
 <?php
 
-namespace rizalrepo\SsoClient;
+namespace Rizalrepo\SsoClient;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;

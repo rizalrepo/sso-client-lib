@@ -1,285 +1,172 @@
-# Client Usage Config
+# UNISM SSO Client SDK
 
-**Current release:** [v1.3.3](md/RELEASE_NOTES_v1.3.3.md) – OAuth hardening, avatar, role-based redirect. [Changelog](md/CHANGELOG.md)
+**Current release:** [v2.0.0](md/RELEASE_NOTES_v2.0.0.md) – Multi-language SDK monorepo. [Changelog](md/CHANGELOG.md)
 
-#installation
+SDK multi-bahasa untuk integrasi aplikasi client ke **unism-sso** (Laravel Passport OAuth2).
 
+## Quick Install
+
+| Bahasa / Runtime | Package | Install |
+|------------------|---------|---------|
+| JavaScript / TypeScript | `@rizalrepo/sso-client` | `npm install @rizalrepo/sso-client` |
+| PHP / Laravel | `rizalrepo/sso-client` | `composer require rizalrepo/sso-client` |
+| PHP native | `rizalrepo/sso-client-core` | `composer require rizalrepo/sso-client-core` |
+| Go, Python, Java, C#, dll. | OpenAPI spec | Generate dari `spec/openapi.yaml` — lihat [Bahasa lain](#bahasa-lain-go-python-java-dll) |
+
+> Credential **wajib** di `.env`, jangan hardcode di source code.
+
+## Konfigurasi (.env)
+
+Semua SDK memakai env vars yang sama:
+
+```env
+SSO_URL=https://sirisa.unism.ac.id
+SSO_CLIENT_ID=your-uuid-client-id
+SSO_CLIENT_SECRET=your-client-secret
+SSO_CALLBACK_URL=https://your-app.example.com/callback
 ```
+
+---
+
+## JavaScript / TypeScript
+
+**Requirement:** Node 18+, Bun, Deno, atau browser dengan `fetch`
+
+```bash
+npm install @rizalrepo/sso-client
+```
+
+```typescript
+import { SSOClient } from "@rizalrepo/sso-client";
+
+const sso = new SSOClient({
+  serverUrl: process.env.SSO_URL!,
+  clientId: process.env.SSO_CLIENT_ID!,
+  clientSecret: process.env.SSO_CLIENT_SECRET!,
+  callbackUrl: process.env.SSO_CALLBACK_URL!,
+});
+
+const state = sso.generateState();
+// res.redirect(sso.getAuthorizeUrl(state));
+
+const { token, user } = await sso.handleCallback(code);
+const roleId = sso.resolveClientRoleId(user, selectedRoleId);
+
+const result = await sso.verifyToken(accessToken);
+```
+
+📄 Detail: [packages/javascript/README.md](packages/javascript/README.md)
+
+---
+
+## PHP / Laravel
+
+**Requirement:** PHP 8.1+, Laravel 10/11/12
+
+```bash
 composer require rizalrepo/sso-client
-```
-
-# Configuration
-
-publish SSOController with run command
-
-```
 php artisan vendor:publish --tag=sso-config
 ```
 
-# Connect with SSO
+Setelah publish, tambahkan routes di `web.php` dan sesuaikan migration `users`.
 
-open config/sso.php and adjust config with your preference
+📄 Detail: [packages/php-laravel/README.md](packages/php-laravel/README.md)
 
-```
-return [
-    'callbackUrl' => "http://127.0.0.1:8000/callback",
-    'serverUrl' => "http://127.0.0.1:8081",
-    'clientId' => "f9c2bbad-c06d-4028-9786-213c9113ddbb",
-    'clientSecret' => "1zJyzTcLmL05ZzMOnaMI6DfhaY9guJLCKBisH4YS",
-];
-```
+---
 
-# Routes
+## PHP Native (tanpa Laravel)
 
-add code to web.php
+**Requirement:** PHP 8.1+, ext-curl, ext-json
 
-```
-Route::controller(SSOController::class)->group(function () {
-    Route::get("/", 'ssoPage');
-    Route::get("/sso/login", 'getLogin')->name("sso.login");
-    Route::get("/callback", 'getCallback')->name("sso.callback");
-    Route::get("/sso/connect", 'connectUser')->name("sso.connect");
+Cocok untuk CodeIgniter, Slim, Symfony, atau plain PHP.
 
-    Route::middleware('auth')->group(function () {
-        Route::get("/sso/logout", 'logout')->name("sso.logout");
-        Route::get("/sso/edit-password", 'editPassword')->name("sso.edit-password");
-        Route::get("/sso/portal", 'portal')->name("sso.portal");
-        Route::get("/sso/profile", 'editProfile')->name("sso.profile");
-    });
-});
+```bash
+composer require rizalrepo/sso-client-core
 ```
 
-# Table
+```php
+use Rizalrepo\SsoClient\SSOClient;
 
-modify file users migration with :
+$sso = SSOClient::fromEnv();
 
-```
-Schema::create('users', function (Blueprint $table) {
-    $table->id();
-    $table->string('name');
-    $table->string('username')->unique();
-    $table->string('phone')->unique();
-    $table->char('prodi', 5)->nullable();
-    $table->bigInteger('oauth_client_role_id');
-    $table->timestamp('email_verified_at')->nullable();
-    $table->rememberToken();
-    $table->timestamps();
-});
+$state = $sso->generateState();
+$_SESSION['oauth_state'] = $state;
+header('Location: ' . $sso->getAuthorizeUrl($state));
+
+$result = $sso->handleCallback($_GET['code']);
+$user = $result['user'];
 ```
 
-# Middleware Settings
+📄 Detail: [packages/php-native/README.md](packages/php-native/README.md)
 
--   for Laravel 11 add command :
+---
 
+## Bahasa lain (Go, Python, Java, dll.)
+
+SDK resmi belum tersedia per bahasa. Gunakan **OpenAPI spec** + panduan OAuth universal:
+
+1. Generate client API dari `spec/openapi.yaml`
+2. Implementasi OAuth manual (`/oauth/authorize`, `/oauth/token`) dari `docs/INTEGRATION.md`
+
+```bash
+# Install OpenAPI Generator: https://openapi-generator.tech
+openapi-generator-cli generate -i spec/openapi.yaml -g python -o clients/python
+openapi-generator-cli generate -i spec/openapi.yaml -g go -o clients/go
+openapi-generator-cli generate -i spec/openapi.yaml -g java -o clients/java
+openapi-generator-cli generate -i spec/openapi.yaml -g csharp -o clients/csharp
 ```
-php artisan make:middleware Authenticate
-```
 
--   then update code bellow to Middleware/Authenticate.php and adjust config with your preference
+📄 Detail: [docs/INTEGRATION.md](docs/INTEGRATION.md)
 
-```
-<?php
-namespace App\Http\Middleware;
+---
 
-use Illuminate\Auth\Middleware\Authenticate as Middleware;
-use Illuminate\Http\Request;
+## Install dari monorepo lokal (belum publish)
 
-class Authenticate extends Middleware
+Jika package belum ada di Packagist / npm registry:
+
+**Composer (Laravel):**
+
+```json
 {
-    private function getConfig($configName)
-    {
-        switch ($configName) {
-            case 'serverUrl':
-                return "http://127.0.0.1:8000/login";
-            default:
-                return null;
-        }
-    }
-
-    protected function redirectTo(Request $request): ?string
-    {
-        return $request->expectsJson() ? null : $this->getConfig('serverUrl');
-    }
+  "repositories": [
+    { "type": "path", "url": "../sso-client-lib/packages/php-laravel" }
+  ],
+  "require": { "rizalrepo/sso-client": "@dev" }
 }
 ```
 
--   then copy code below to file bootstrap/app.php
+**Composer (PHP native):**
 
-```
-$middleware->alias(['auth' => Authenticate::class]);
-```
-
--   for Laravel 10 : update code bellow to Middleware/Authenticate.php and adjust config with your preference
-
-```
-<?php
-namespace App\Http\Middleware;
-
-use Illuminate\Auth\Middleware\Authenticate as Middleware;
-use Illuminate\Http\Request;
-
-class Authenticate extends Middleware
+```json
 {
-    private function getConfig($configName)
-    {
-        switch ($configName) {
-            case 'serverUrl':
-                return "http://127.0.0.1:8000/login";
-            default:
-                return null;
-        }
-    }
-
-    protected function redirectTo(Request $request): ?string
-    {
-        return $request->expectsJson() ? null : $this->getConfig('serverUrl');
-    }
+  "repositories": [
+    { "type": "path", "url": "../sso-client-lib/packages/php-native" }
+  ],
+  "require": { "rizalrepo/sso-client-core": "@dev" }
 }
 ```
 
-# Views Config
+**npm:**
 
--   use code bellow for show user avatar, direct url portal, update profile, edit-password and logout
-
-```
-{{-- in app blade --}}
-
-<div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-    <img class="b-r-10 avatar-image" src="{{ session('avatar') }}" alt="Logo">
-    @if(session()->has('countAccess'))
-        @if (session('countAccess') > 1)
-            <a class="dropdown-item" href="{{ route('sso.portal') }}">Portal</a>
-        @endif
-    @endif
-    <a href="{{ route('sso.profile') }}" onclick="saveReferrer()"><i class="fas fa-user-edit me-2"></i><span>Edit Profile</span></a>
-    <a class="dropdown-item" href="{{ route('sso.edit-password') }}" onclick="saveReferrer()">
-        Edit Password
-    </a>
-    <a class="dropdown-item" href="{{ route('sso.logout') }}"
-        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-        {{ __('Logout') }}
-    </a>
-
-    <form id="logout-form" action="{{ route('sso.logout') }}" method="GET" class="d-none">
-        @csrf
-    </form>
-</div>
-
-{{-- previous url config in js.blade --}}
-
-<script>
-    function saveReferrer() {
-        var previousUrl = document.referrer;
-        var previousUrlInput = document.getElementById("previous_url");
-        if (previousUrlInput) {
-            previousUrlInput.value = previousUrl;
-        }
-    }
-</script>
+```bash
+npm install ../sso-client-lib/packages/javascript
 ```
 
-# User Controller for Client
+---
 
--   add this code to store function after user created
-
-```
-$ssoController = new \App\Http\Controllers\SSO\SSOController();
-$userArray = [
-    'name' => $user->name,
-    'username' => $user->username,
-    'phone' => $user->phone,
-    'oauth_client_role_id' => $user->oauth_client_role_id,
-];
-
-$ssoController->createUserOnServer($userArray);
-```
-
--   add this code to update function after user updated
+## Arsitektur
 
 ```
-$oldUsername = $user->username; // this code add before update()
-
-// this is code for update in client then copy code below
-
-$updatedUserArray = [
-    'name' => $user->name,
-    'username' => $user->username,
-    'prodi' => $user->prodi,
-    'phone' => $user->phone,
-    'oauth_client_role_id' => $user->oauth_client_role_id,
-    'old_username' => $oldUsername,
-];
-
-$ssoController = new \App\Http\Controllers\SSO\SSOController();
-$ssoController->updateUserOnServer($updatedUserArray);
+sso-client-lib/
+├── spec/openapi.yaml          # Kontrak API /api/*
+├── docs/INTEGRATION.md        # Panduan OAuth + integrasi universal
+├── packages/
+│   ├── javascript/            # @rizalrepo/sso-client
+│   ├── php-laravel/           # rizalrepo/sso-client
+│   └── php-native/            # rizalrepo/sso-client-core
+└── md/                        # Release notes & changelog
 ```
 
--   add this code to destroy function after user deleted
+## Changelog
 
-```
-$userData = [
-    'username' => $user->username,
-    'oauth_client_role_id' => $user->oauth_client_role_id
-];
-
-$ssoController = new \App\Http\Controllers\SSO\SSOController();
-$ssoController->deleteUserOnServer($userData);
-```
-
-# Verify Api Token from Client
-
--   create new middleware with run command :
-
-```
-php artisan make:middleware VerifyApiToken
-```
-
--   then open file VerifyApiToken and replace with the code below
-
-```
-<?php
-
-namespace App\Http\Middleware;
-
-use Closure;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-
-class VerifyApiToken
-{
-    public function handle($request, Closure $next)
-    {
-        $token = $request->bearerToken();
-
-        if (!$token) {
-            Log::warning('No bearer token provided and no access token in session');
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        try {
-            $serverUrl = Config::get('sso.serverUrl');
-            $response = Http::timeout(5)->withHeaders([
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . $token,
-            ])->get($serverUrl . '/api/verify-token');
-
-            if ($response->successful()) {
-                $request->merge(['sso_user' => $response->json()]);
-                return $next($request);
-            }
-
-            return response()->json(['error' => 'Invalid token'], 401);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error verifying token'], 500);
-        }
-    }
-}
-
-```
-
--   add middleware aliases to Kernel.php for Laravel 10 or to bootstrap/app.php for Laravel 11
-
-```
-'verify.api.token' => \App\Http\Middleware\VerifyApiToken::class,
-```
+Lihat [md/CHANGELOG.md](md/CHANGELOG.md) · [md/MULTI_LANGUAGE_SDK.md](md/MULTI_LANGUAGE_SDK.md)

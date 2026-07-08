@@ -1,0 +1,40 @@
+{
+	"name": "@rizalrepo/sso-client",
+	"version": "2.0.0",
+	"description": "UNISM SSO client SDK — OAuth2 + API (Node, Bun, Deno, browser)",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": ["dist"],
+	"scripts": {
+		"build": "tsc",
+		"prepublishOnly": "npm run build"
+	},
+	"keywords": ["unism", "sso", "oauth2", "passport"],
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/rizalrepo/sso-client-lib.git",
+		"directory": "packages/javascript"
+	},
+	"bugs": {
+		"url": "https://github.com/rizalrepo/sso-client-lib/issues"
+	},
+	"homepage": "https://github.com/rizalrepo/sso-client-lib#readme",
+	"publishConfig": {
+		"access": "public"
+	},
+	"devDependencies": {
+		"@types/node": "^20.0.0",
+		"typescript": "^5.4.0"
+	},
+	"engines": {
+		"node": ">=18"
+	}
+}

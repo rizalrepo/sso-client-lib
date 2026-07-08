@@ -5,6 +5,27 @@ Semua perubahan penting pada package ini didokumentasikan di file ini.
 Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 dan project ini mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-07-08
+
+### Added
+
+- **Multi-language monorepo**: `packages/javascript`, `packages/php-laravel`, `packages/php-native`.
+- **OpenAPI spec**: `spec/openapi.yaml` untuk generate client bahasa lain.
+- **Integration guide**: `docs/INTEGRATION.md` — panduan OAuth universal.
+
+### Changed
+
+- **BREAKING**: Struktur repo monorepo; PHP source pindah ke `packages/php-laravel/src/`.
+- Namespace `SSOClientServiceProvider` diperbaiki ke `Rizalrepo\SsoClient`.
+- PHP minimum `^8.1`; `illuminate/support` dan `illuminate/http` dideklarasikan eksplisit.
+
+### Notes
+
+- `composer require rizalrepo/sso-client` tetap kompatibel (autoload root `composer.json`).
+- Lihat [md/MULTI_LANGUAGE_SDK.md](MULTI_LANGUAGE_SDK.md) untuk detail migrasi.
+
+**Diff:** https://github.com/rizalrepo/sso-client-lib/compare/v1.3.3...v2.0.0
+
 ## [1.3.3] - 2026-03-12
 
 ### Added
