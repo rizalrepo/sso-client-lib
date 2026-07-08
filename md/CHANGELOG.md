@@ -1,9 +1,24 @@
-# Changelog - SSO Client Lib
+# Changelog
 
-All notable changes to this project are documented in this file.
+All notable changes are documented here. Format: [Keep a Changelog](https://keepachangelog.com/).
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.0.1] - 2026-07-08
+
+### Changed
+
+- Laravel `SSOController` delegates to `SSOClient` (no duplicate HTTP logic).
+- PHP HTTP via `file_get_contents` instead of `curl` (`ext-curl` no longer required).
+- Merged `verifyToken` + `verifyTokenFull` into `verifyToken($token, $full)`.
+- Replaced four URL getters with `ssoUrl($path)`.
+- JS SDK trimmed to OAuth essentials (removed user-management CRUD).
+- Removed vendored `openapi.yaml` — use `{SSO_URL}/developer/openapi.yaml`.
+- Consolidated docs; removed duplicate release-note files.
+
+### Removed
+
+- `packages/javascript/src/index.ts` barrel, `types.ts` (merged into `client.ts`).
+- `packages/php-laravel/composer.json` (root `composer.json` is canonical).
+- `md/MULTI_LANGUAGE_SDK.md`, `md/RELEASE_*`, `md/GITHUB_RELEASE_*`.
 
 ## [2.0.0] - 2026-07-08
 
@@ -22,7 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Notes
 
 - `composer require rizalrepo/sso-client` remains compatible (root `composer.json` autoload).
-- See [md/MULTI_LANGUAGE_SDK.md](MULTI_LANGUAGE_SDK.md) for migration details.
 
 **Diff:** https://github.com/rizalrepo/sso-client-lib/compare/v1.3.3...v2.0.0
 

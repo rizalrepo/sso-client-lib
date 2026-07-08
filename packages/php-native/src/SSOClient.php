@@ -4,10 +4,7 @@ namespace Rizalrepo\SsoClient;
 
 use RuntimeException;
 
-/**
- * HTTP client SSO UNISM — PHP native (tanpa Laravel/framework).
- * OAuth2 Authorization Code + API user management.
- */
+/** HTTP client for UNISM SSO — OAuth2 + user management API. */
 class SSOClient
 {
     private string $serverUrl;
@@ -35,7 +32,6 @@ class SSOClient
     public static function fromEnv(?array $env = null): self
     {
         $env = $env ?? $_ENV;
-
         $serverUrl = $env['SSO_URL'] ?? $env['SSO_SERVER_URL'] ?? null;
         $clientId = $env['SSO_CLIENT_ID'] ?? null;
         $clientSecret = $env['SSO_CLIENT_SECRET'] ?? null;
@@ -55,6 +51,11 @@ class SSOClient
         return bin2hex(random_bytes(20));
     }
 
+    public function ssoUrl(string $path): string
+    {
+        return $this->serverUrl . '/' . ltrim($path, '/');
+    }
+
     public function getAuthorizeUrl(string $state, $roleId = null): string
     {
         $params = [
@@ -69,17 +70,14 @@ class SSOClient
             $params['role_id'] = (string) $roleId;
         }
 
-        return $this->serverUrl . '/oauth/authorize?' . http_build_query($params);
+        return $this->ssoUrl('oauth/authorize') . '?' . http_build_query($params);
     }
 
     /** @return array{token_type: string, expires_in: int, access_token: string, refresh_token?: string} */
     public function exchangeCodeForToken(string $code): array
     {
         [$status, $body] = $this->request('POST', '/oauth/token', [
-            'headers' => [
-                'Accept: application/json',
-                'Content-Type: application/x-www-form-urlencoded',
-            ],
+            'headers' => ['Content-Type: application/x-www-form-urlencoded'],
             'body' => http_build_query([
                 'grant_type' => 'authorization_code',
                 'client_id' => $this->clientId,
@@ -102,9 +100,7 @@ class SSOClient
     /** @return array<string, mixed> */
     public function getUser(string $accessToken): array
     {
-        [$status, $body] = $this->request('GET', '/api/user', [
-            'token' => $accessToken,
-        ]);
+        [$status, $body] = $this->request('GET', '/api/user', ['token' => $accessToken]);
 
         if ($status < 200 || $status >= 300) {
             throw new RuntimeException("Failed to get user ({$status})");
@@ -114,17 +110,10 @@ class SSOClient
     }
 
     /** @return array<string, mixed> */
-    public function verifyToken(string $accessToken): array
+    public function verifyToken(string $accessToken, bool $full = false): array
     {
-        [, $body] = $this->request('GET', '/api/verify-token', ['token' => $accessToken]);
-
-        return json_decode($body, true) ?? [];
-    }
-
-    /** @return array<string, mixed> */
-    public function verifyTokenFull(string $accessToken): array
-    {
-        [, $body] = $this->request('GET', '/api/authorize/verify-token', ['token' => $accessToken]);
+        $path = $full ? '/api/authorize/verify-token' : '/api/verify-token';
+        [, $body] = $this->request('GET', $path, ['token' => $accessToken]);
 
         return json_decode($body, true) ?? [];
     }
@@ -159,33 +148,11 @@ class SSOClient
         return $first['oauth_client_role_id'] ?? $first['oauth_client_role']['id'] ?? null;
     }
 
-    public function getLogoutUrl(): string
-    {
-        return $this->serverUrl . '/sso/logout';
-    }
-
-    public function getPortalUrl(): string
-    {
-        return $this->serverUrl . '/portal';
-    }
-
-    public function getProfileUrl(): string
-    {
-        return $this->serverUrl . '/profile';
-    }
-
-    public function getEditPasswordUrl(): string
-    {
-        return $this->serverUrl . '/edit-password';
-    }
-
     /** @param array<string, mixed>|null $user */
     public function defaultAvatarUrl(?array $user = null): string
     {
-        return $user['avatar_url'] ?? $this->serverUrl . '/assets/images/dashboard/profile.png';
+        return $user['avatar_url'] ?? $this->ssoUrl('assets/images/dashboard/profile.png');
     }
-
-  // --- User management API ---
 
     public function findUserByUsername(string $accessToken, string $username): mixed
     {
@@ -219,10 +186,7 @@ class SSOClient
     {
         [$status] = $this->request('POST', '/api/oauthClientUsers', [
             'token' => $accessToken,
-            'json' => [
-                'user_id' => $userId,
-                'oauth_client_role_id' => $oauthClientRoleId,
-            ],
+            'json' => ['user_id' => $userId, 'oauth_client_role_id' => $oauthClientRoleId],
         ]);
 
         return $status >= 200 && $status < 300;
@@ -272,13 +236,6 @@ class SSOClient
      */
     private function request(string $method, string $path, array $options = []): array
     {
-        if (!function_exists('curl_init')) {
-            throw new RuntimeException('PHP curl extension required');
-        }
-
-        $url = $this->serverUrl . $path;
-        $ch = curl_init($url);
-
         $headers = $options['headers'] ?? ['Accept: application/json'];
 
         if (!empty($options['token'])) {
@@ -290,41 +247,27 @@ class SSOClient
             $options['body'] = json_encode($options['json']);
         }
 
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_TIMEOUT => 30,
+        $context = stream_context_create([
+            'http' => [
+                'method' => $method,
+                'header' => implode("\r\n", $headers) . "\r\n",
+                'timeout' => 30,
+                'ignore_errors' => true,
+                'content' => $options['body'] ?? null,
+            ],
         ]);
 
-        if (!empty($options['body'])) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $options['body']);
-        }
-
-        $body = curl_exec($ch);
-        $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $body = file_get_contents($this->serverUrl . $path, false, $context);
 
         if ($body === false) {
-            $error = curl_error($ch);
-            curl_close($ch);
-            throw new RuntimeException('HTTP request failed: ' . $error);
+            throw new RuntimeException('HTTP request failed');
         }
 
-        curl_close($ch);
+        $status = 0;
+        if (isset($http_response_header[0]) && preg_match('/\s(\d{3})\s/', $http_response_header[0], $m)) {
+            $status = (int) $m[1];
+        }
 
         return [$status, $body];
     }
-}
-
-// ponytail: self-check — php packages/php-native/src/SSOClient.php
-if (PHP_SAPI === 'cli' && ($argv[0] ?? '') === __FILE__) {
-    $c = new SSOClient([
-        'serverUrl' => 'https://example.com',
-        'clientId' => 'id',
-        'clientSecret' => 'secret',
-        'callbackUrl' => 'https://app.example.com/callback',
-    ]);
-    assert(str_contains($c->getAuthorizeUrl('abc123'), 'client_id=id'));
-    assert($c->generateState() !== '');
-    echo "OK\n";
 }

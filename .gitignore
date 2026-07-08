@@ -1,5 +1,6 @@
 /vendor/
 packages/*/vendor/
+packages/*/composer.lock
 packages/javascript/node_modules/
 node_modules/
 dist/
