@@ -1,6 +1,6 @@
 {
 	"name": "@rizalrepo/sso-client",
-	"version": "2.0.1",
+	"version": "2.0.2",
 	"description": "UNISM SSO client SDK — OAuth2 (Node 18+, Bun, Deno, browser)",
 	"type": "module",
 	"main": "./dist/client.js",

@@ -4,16 +4,15 @@ namespace Rizalrepo\SsoClient;
 
 use RuntimeException;
 
-/** HTTP client for UNISM SSO — OAuth2 + user management API. */
+/** HTTP client for UNISM SSO — OAuth2 Authorization Code flow. */
 class SSOClient
 {
     private string $serverUrl;
     private string $clientId;
     private string $clientSecret;
     private string $callbackUrl;
-    private string $scope;
 
-    /** @param array{serverUrl: string, clientId: string, clientSecret: string, callbackUrl: string, scope?: string} $config */
+    /** @param array{serverUrl: string, clientId: string, clientSecret: string, callbackUrl: string} $config */
     public function __construct(array $config)
     {
         foreach (['serverUrl', 'clientId', 'clientSecret', 'callbackUrl'] as $key) {
@@ -26,24 +25,6 @@ class SSOClient
         $this->clientId = $config['clientId'];
         $this->clientSecret = $config['clientSecret'];
         $this->callbackUrl = $config['callbackUrl'];
-        $this->scope = $config['scope'] ?? 'access-user';
-    }
-
-    public static function fromEnv(?array $env = null): self
-    {
-        $env = $env ?? $_ENV;
-        $serverUrl = $env['SSO_URL'] ?? $env['SSO_SERVER_URL'] ?? null;
-        $clientId = $env['SSO_CLIENT_ID'] ?? null;
-        $clientSecret = $env['SSO_CLIENT_SECRET'] ?? null;
-        $callbackUrl = $env['SSO_CALLBACK_URL'] ?? null;
-
-        if (!$serverUrl || !$clientId || !$clientSecret || !$callbackUrl) {
-            throw new RuntimeException(
-                'Missing SSO env: SSO_URL, SSO_CLIENT_ID, SSO_CLIENT_SECRET, SSO_CALLBACK_URL'
-            );
-        }
-
-        return new self(compact('serverUrl', 'clientId', 'clientSecret', 'callbackUrl'));
     }
 
     public function generateState(): string
@@ -62,7 +43,7 @@ class SSOClient
             'client_id' => $this->clientId,
             'redirect_uri' => $this->callbackUrl,
             'response_type' => 'code',
-            'scope' => $this->scope,
+            'scope' => 'access-user',
             'state' => $state,
         ];
 
@@ -118,13 +99,17 @@ class SSOClient
         return json_decode($body, true) ?? [];
     }
 
-    /** @return array{token: array<string, mixed>, user: array<string, mixed>} */
-    public function handleCallback(string $code): array
+    /** @return array{0: int, 1: array<string, mixed>|null} */
+    public function api(string $method, string $path, string $accessToken, ?array $json = null): array
     {
-        $token = $this->exchangeCodeForToken($code);
-        $user = $this->getUser($token['access_token']);
+        $options = ['token' => $accessToken];
+        if ($json !== null) {
+            $options['json'] = $json;
+        }
 
-        return compact('token', 'user');
+        [$status, $body] = $this->request($method, $path, $options);
+
+        return [$status, json_decode($body, true)];
     }
 
     /** @param array<string, mixed> $user */
@@ -146,88 +131,6 @@ class SSOClient
         $first = $clientUsers[0] ?? null;
 
         return $first['oauth_client_role_id'] ?? $first['oauth_client_role']['id'] ?? null;
-    }
-
-    /** @param array<string, mixed>|null $user */
-    public function defaultAvatarUrl(?array $user = null): string
-    {
-        return $user['avatar_url'] ?? $this->ssoUrl('assets/images/dashboard/profile.png');
-    }
-
-    public function findUserByUsername(string $accessToken, string $username): mixed
-    {
-        [$status, $body] = $this->request(
-            'GET',
-            '/api/username?username=' . rawurlencode($username),
-            ['token' => $accessToken]
-        );
-
-        if ($status < 200 || $status >= 300) {
-            return null;
-        }
-
-        $json = json_decode($body, true) ?? [];
-
-        return $json['data'] ?? null;
-    }
-
-    /** @param array<string, mixed> $payload */
-    public function createUser(string $accessToken, array $payload): mixed
-    {
-        [$status, $body] = $this->request('POST', '/api/user', [
-            'token' => $accessToken,
-            'json' => array_merge(['is_client' => true, 'is_active' => true], $payload),
-        ]);
-
-        return ($status >= 200 && $status < 300) ? json_decode($body, true) : null;
-    }
-
-    public function assignClientRole(string $accessToken, int $userId, int $oauthClientRoleId): bool
-    {
-        [$status] = $this->request('POST', '/api/oauthClientUsers', [
-            'token' => $accessToken,
-            'json' => ['user_id' => $userId, 'oauth_client_role_id' => $oauthClientRoleId],
-        ]);
-
-        return $status >= 200 && $status < 300;
-    }
-
-    /** @param array<string, mixed> $payload */
-    public function updateUser(
-        string $accessToken,
-        string $oldUsername,
-        string $newUsername,
-        array $payload
-    ): bool {
-        [$status] = $this->request(
-            'PUT',
-            '/api/user/' . rawurlencode($oldUsername) . '/' . rawurlencode($newUsername),
-            ['token' => $accessToken, 'json' => $payload]
-        );
-
-        return $status >= 200 && $status < 300;
-    }
-
-    public function setUserActive(string $accessToken, string $username, bool $isActive): bool
-    {
-        [$status] = $this->request(
-            'POST',
-            '/api/user/actived/' . rawurlencode($username),
-            ['token' => $accessToken, 'json' => ['is_active' => $isActive]]
-        );
-
-        return $status >= 200 && $status < 300;
-    }
-
-    public function deleteUser(string $accessToken, string $username, int $oauthClientRoleId): bool
-    {
-        [$status] = $this->request(
-            'DELETE',
-            '/api/user/' . rawurlencode($username),
-            ['token' => $accessToken, 'json' => ['oauth_client_role_id' => $oauthClientRoleId]]
-        );
-
-        return $status >= 200 && $status < 300;
     }
 
     /**

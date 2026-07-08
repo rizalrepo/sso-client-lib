@@ -2,6 +2,17 @@
 
 All notable changes are documented here. Format: [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.0.2] - 2026-07-08
+
+### Changed
+
+- `SSOClient` OAuth-only; CRUD via generic `api()` (PHP) or Laravel controller.
+- Laravel: lazy client cache, `token()` helper, simplified user sync (no PRODI logging).
+- Removed `fromEnv()`, `handleCallback()`, `defaultAvatarUrl()`, configurable `scope`.
+- JS: `crypto.randomUUID()` for state, unified `ssoUrl()` in fetch.
+- Laravel `require`s `rizalrepo/sso-client-core` (no duplicate autoload).
+- Package READMEs trimmed to links.
+
 ## [2.0.1] - 2026-07-08
 
 ### Changed

@@ -12,14 +12,26 @@ use Rizalrepo\SsoClient\SSOClient;
 
 class SSOController extends Controller
 {
+    private ?SSOClient $client = null;
+
     private function sso(): SSOClient
     {
-        return new SSOClient([
+        return $this->client ??= new SSOClient([
             'serverUrl'    => Config::get('sso.serverUrl'),
             'clientId'     => Config::get('sso.clientId'),
             'clientSecret' => Config::get('sso.clientSecret'),
             'callbackUrl'  => Config::get('sso.callbackUrl'),
         ]);
+    }
+
+    private function token(): string
+    {
+        return session()->get('access_token');
+    }
+
+    private function ok(int $status): bool
+    {
+        return $status >= 200 && $status < 300;
     }
 
     public function ssoPage()
@@ -70,12 +82,12 @@ class SSOController extends Controller
     public function connectUser(Request $request)
     {
         $sso = $this->sso();
-        $accessToken = $request->session()->get('access_token');
+        $accessToken = $this->token();
         $userArray = $sso->getUser($accessToken);
 
         $request->session()->put([
             'countAccess' => count($userArray['oauth_client_users'] ?? []),
-            'avatar' => $sso->defaultAvatarUrl($userArray),
+            'avatar' => $userArray['avatar_url'] ?? $sso->ssoUrl('assets/images/dashboard/profile.png'),
             'access_token' => $accessToken,
             'last_sso_profile_refresh' => time(),
         ]);
@@ -90,42 +102,17 @@ class SSOController extends Controller
             $user->name = $userArray['name'];
             $user->username = $userArray['username'];
             $user->phone = $userArray['phone'];
-            $user->prodi = !empty($userArray['prodi']) ? $userArray['prodi'] : null;
+            $user->prodi = $userArray['prodi'] ?: null;
             $user->email_verified_at = $userArray['email_verified_at'];
             $user->oauth_client_role_id = $oauthClientRoleId;
             $user->save();
-
-            if (empty($userArray['prodi'])) {
-                Log::warning('[PRODI_SYNC] New user created without prodi', [
-                    'username' => $userArray['username'],
-                ]);
-            }
         } else {
-            $oldProdi = $user->prodi;
-            $newProdi = $userArray['prodi'];
-            $updateData = [
+            $user->update([
                 'name' => $userArray['name'],
                 'phone' => $userArray['phone'],
+                'prodi' => $userArray['prodi'] ?: $user->prodi,
                 'oauth_client_role_id' => $oauthClientRoleId,
-            ];
-
-            if (empty($newProdi)) {
-                Log::warning('[PRODI_SYNC] SSO returned empty prodi, keeping existing', [
-                    'username' => $userArray['username'],
-                    'existing_prodi' => $oldProdi,
-                ]);
-            } elseif ($oldProdi !== $newProdi) {
-                $updateData['prodi'] = $newProdi;
-                Log::info('[PRODI_SYNC] Prodi changed', [
-                    'username' => $userArray['username'],
-                    'old' => $oldProdi,
-                    'new' => $newProdi,
-                ]);
-            } else {
-                $updateData['prodi'] = $newProdi;
-            }
-
-            $user->update($updateData);
+            ]);
         }
 
         Auth::login($user);
@@ -158,66 +145,81 @@ class SSOController extends Controller
     public function createUserOnServer($userArray)
     {
         $sso = $this->sso();
-        $token = session()->get('access_token');
-        $existing = $sso->findUserByUsername($token, $userArray['username']);
+        $token = $this->token();
+        [$status, $existing] = $sso->api(
+            'GET',
+            '/api/username?username=' . rawurlencode($userArray['username']),
+            $token
+        );
 
-        if ($existing) {
-            return $sso->assignClientRole($token, $existing['id'], $userArray['oauth_client_role_id']);
+        if ($this->ok($status) && !empty($existing['data'])) {
+            return $this->ok($sso->api('POST', '/api/oauthClientUsers', $token, [
+                'user_id' => $existing['data']['id'],
+                'oauth_client_role_id' => $userArray['oauth_client_role_id'],
+            ])[0]);
         }
 
-        $newUser = $sso->createUser($token, [
+        [$status, $newUser] = $sso->api('POST', '/api/user', $token, [
             'name' => $userArray['name'],
             'username' => $userArray['username'],
             'phone' => $userArray['phone'],
             'prodi' => $userArray['prodi'],
             'password' => bcrypt($userArray['username']),
+            'is_client' => true,
             'is_active' => $userArray['is_active'] ?? 1,
         ]);
 
-        return $newUser
-            ? $sso->assignClientRole($token, $newUser['id'], $userArray['oauth_client_role_id'])
-            : false;
+        if (!$this->ok($status) || !$newUser) {
+            return false;
+        }
+
+        return $this->ok($sso->api('POST', '/api/oauthClientUsers', $token, [
+            'user_id' => $newUser['id'],
+            'oauth_client_role_id' => $userArray['oauth_client_role_id'],
+        ])[0]);
     }
 
     public function updateUserOnServer($userArray)
     {
         $sso = $this->sso();
-        $token = session()->get('access_token');
+        $token = $this->token();
+        [$status] = $sso->api(
+            'PUT',
+            '/api/user/' . rawurlencode($userArray['old_username']) . '/' . rawurlencode($userArray['username']),
+            $token,
+            [
+                'name' => $userArray['name'],
+                'username' => $userArray['username'],
+                'phone' => $userArray['phone'],
+                'prodi' => $userArray['prodi'],
+                'oauth_client_role_id' => $userArray['oauth_client_role_id'],
+            ]
+        );
 
-        if (!$sso->findUserByUsername($token, $userArray['old_username'])) {
-            return false;
-        }
-
-        return $sso->updateUser($token, $userArray['old_username'], $userArray['username'], [
-            'name' => $userArray['name'],
-            'username' => $userArray['username'],
-            'phone' => $userArray['phone'],
-            'prodi' => $userArray['prodi'],
-            'oauth_client_role_id' => $userArray['oauth_client_role_id'],
-        ]);
+        return $this->ok($status);
     }
 
     public function updateUserActiveOnServer($userArray)
     {
-        $sso = $this->sso();
-        $token = session()->get('access_token');
+        [$status] = $this->sso()->api(
+            'POST',
+            '/api/user/actived/' . rawurlencode($userArray['username']),
+            $this->token(),
+            ['is_active' => $userArray['is_active']]
+        );
 
-        if (!$sso->findUserByUsername($token, $userArray['username'])) {
-            return false;
-        }
-
-        return $sso->setUserActive($token, $userArray['username'], (bool) $userArray['is_active']);
+        return $this->ok($status);
     }
 
     public function deleteUserOnServer($userData)
     {
-        $sso = $this->sso();
-        $token = session()->get('access_token');
+        [$status] = $this->sso()->api(
+            'DELETE',
+            '/api/user/' . rawurlencode($userData['username']),
+            $this->token(),
+            ['oauth_client_role_id' => $userData['oauth_client_role_id']]
+        );
 
-        if (!$sso->findUserByUsername($token, $userData['username'])) {
-            return false;
-        }
-
-        return $sso->deleteUser($token, $userData['username'], $userData['oauth_client_role_id']);
+        return $this->ok($status);
     }
 }

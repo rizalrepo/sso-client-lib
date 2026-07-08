@@ -1,7 +1,7 @@
 {
     "name": "rizalrepo/sso-client-core",
     "description": "UNISM SSO client SDK — PHP native (no framework)",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "type": "library",
     "homepage": "https://github.com/rizalrepo/sso-client-lib",
     "require": {
