@@ -2,6 +2,12 @@
 
 All notable changes are documented here. Format: [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.1.2] - 2026-07-08
+
+### Changed
+
+- Docs: update root `README.md` to mention `sso:install` and latest version.
+
 ## [2.1.1] - 2026-07-08
 
 ### Added

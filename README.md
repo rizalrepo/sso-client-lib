@@ -1,6 +1,6 @@
 # UNISM SSO Client SDK
 
-**v2.1.0** · [Changelog](md/CHANGELOG.md) · [Integration guide](docs/INTEGRATION.md)
+**v2.1.2** · [Changelog](md/CHANGELOG.md) · [Integration guide](docs/INTEGRATION.md)
 
 | Runtime | Package | Install |
 |---------|---------|---------|
@@ -24,6 +24,8 @@ const user = await sso.getUser(token.access_token);
 ```
 
 Laravel: satu perintah `composer require` — routes & config otomatis. Publish opsional: `php artisan vendor:publish --tag=sso-config`
+
+Laravel setup opsional: `php artisan sso:install` (publish config + stub controller).
 
 ## UI integration (avatar, username, edit profile/password)
 
