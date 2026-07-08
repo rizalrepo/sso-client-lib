@@ -24,6 +24,20 @@ ServiceProvider otomatis:
 
 Tidak perlu `vendor:publish` untuk setup dasar.
 
+## Setup otomatis (opsional)
+
+Kalau ingin sekalian publish `config/sso.php` + stub controller (untuk override):
+
+```bash
+php artisan sso:install
+```
+
+Gunakan `--force` jika ingin overwrite file yang sudah ada:
+
+```bash
+php artisan sso:install --force
+```
+
 ## Env wajib
 
 ```env

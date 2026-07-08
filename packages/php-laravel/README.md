@@ -22,6 +22,20 @@ SSO_CALLBACK_URL=https://your-app.example.com/callback
 
 Pastikan route `home` ada (redirect setelah login).
 
+## Setup otomatis (opsional)
+
+Kalau mau sekalian publish `config/sso.php` + stub controller (untuk override), jalankan:
+
+```bash
+php artisan sso:install
+```
+
+Gunakan `--force` jika ingin overwrite file yang sudah ada:
+
+```bash
+php artisan sso:install --force
+```
+
 ## Kustomisasi (opsional)
 
 Publish hanya jika perlu override config atau controller:

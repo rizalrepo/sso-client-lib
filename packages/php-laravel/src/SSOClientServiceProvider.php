@@ -4,6 +4,7 @@ namespace Rizalrepo\SsoClient;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
+use Rizalrepo\SsoClient\Console\Commands\SSOInstallCommand;
 
 class SSOClientServiceProvider extends ServiceProvider
 {
@@ -13,6 +14,12 @@ class SSOClientServiceProvider extends ServiceProvider
 
         if (config('sso.register_routes', true)) {
             $this->loadRoutesFrom(__DIR__ . '/routes/sso.php');
+        }
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                SSOInstallCommand::class,
+            ]);
         }
 
         $this->publishes([

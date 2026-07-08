@@ -2,6 +2,12 @@
 
 All notable changes are documented here. Format: [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.1.1] - 2026-07-08
+
+### Added
+
+- Laravel: `php artisan sso:install` to publish config + controller stub and print required `.env` keys.
+
 ## [2.1.0] - 2026-07-08
 
 ### Added
