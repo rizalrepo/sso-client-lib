@@ -1,7 +1,7 @@
 {
     "name": "rizalrepo/sso-client",
     "description": "UNISM SSO Client SDK — Laravel + JavaScript + PHP native",
-    "version": "2.1.2",
+    "version": "2.2.0",
     "type": "laravel-package",
     "homepage": "https://github.com/rizalrepo/sso-client-lib",
     "support": {

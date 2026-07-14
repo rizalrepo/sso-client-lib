@@ -96,6 +96,12 @@ class SSOController extends Controller
             'last_sso_profile_refresh' => time(),
         ]);
 
+        if (!empty($userArray['impersonator']) && is_array($userArray['impersonator'])) {
+            $request->session()->put('sso_impersonator', $userArray['impersonator']);
+        } else {
+            $request->session()->forget('sso_impersonator');
+        }
+
         $selectedRoleId = $request->session()->pull('selected_role_id') ?? $request->query('role_id');
         $oauthClientRoleId = $sso->resolveClientRoleId($userArray, $selectedRoleId);
 
@@ -129,6 +135,26 @@ class SSOController extends Controller
     {
         Auth::logout();
         return redirect($this->sso()->ssoUrl('sso/logout'));
+    }
+
+    /**
+     * Logout lokal client lalu kembalikan session SSO ke admin (impersonator).
+     */
+    public function leaveImpersonate(Request $request)
+    {
+        Auth::logout();
+        $request->session()->forget([
+            'access_token',
+            'refresh_token',
+            'token_type',
+            'expires_in',
+            'sso_impersonator',
+            'countAccess',
+            'avatar',
+            'last_sso_profile_refresh',
+        ]);
+
+        return redirect($this->sso()->ssoUrl('impersonate/leave'));
     }
 
     public function portal()

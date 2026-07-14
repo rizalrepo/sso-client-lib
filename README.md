@@ -1,11 +1,11 @@
 # UNISM SSO Client SDK
 
-**v2.1.2** · [Changelog](md/CHANGELOG.md) · [Integration guide](docs/INTEGRATION.md)
+**v2.2.0** · [Changelog](md/CHANGELOG.md) · [Integration guide](docs/INTEGRATION.md)
 
 | Runtime | Package | Install |
 |---------|---------|---------|
 | JavaScript / TypeScript | `@rizalrepo/sso-client` | `npm install @rizalrepo/sso-client` |
-| PHP (native or Laravel) | `rizalrepo/sso-client` | `composer require rizalrepo/sso-client:^2.1` |
+| PHP (native or Laravel) | `rizalrepo/sso-client` | `composer require rizalrepo/sso-client:^2.2` |
 | Other languages | Live OpenAPI | `{SSO_URL}/developer/openapi.yaml` |
 
 ```env

@@ -3,13 +3,13 @@
 ## Satu perintah
 
 ```bash
-composer require rizalrepo/sso-client:^2.1
+composer require rizalrepo/sso-client:^2.2
 ```
 
 Setelah install, Laravel **otomatis** mendaftarkan:
 
 - **Config** `sso.*` (via `mergeConfigFrom`)
-- **Routes** SSO (`/sso/login`, `/callback`, `/sso/connect`, dll.)
+- **Routes** SSO (`/sso/login`, `/callback`, `/sso/connect`, `/sso/leave-impersonate`, dll.)
 
 Tambahkan env di `.env`:
 
@@ -100,6 +100,10 @@ After `connectUser()`, data comes from two places:
 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
     <img class="avatar-image" src="{{ session('avatar') }}" alt="{{ Auth::user()->name }}">
 
+    @if(session()->has('sso_impersonator'))
+        <a class="dropdown-item text-warning" href="{{ route('sso.leave-impersonate') }}">Kembali ke Superadmin</a>
+    @endif
+
     @if(session('countAccess', 0) > 1)
         <a class="dropdown-item" href="{{ route('sso.portal') }}">Portal</a>
     @endif
@@ -122,6 +126,7 @@ After `connectUser()`, data comes from two places:
 
 | Link | Route | Behaviour |
 |------|-------|-----------|
+| **Kembali ke Superadmin** | `sso.leave-impersonate` | Tampil jika `session('sso_impersonator')` — logout lokal + `{SSO_URL}/impersonate/leave` |
 | **Edit Profile** | `sso.profile` | Redirect to `{SSO_URL}/profile` — user edits name, photo, phone on SSO |
 | **Edit Password** | `sso.edit-password` | Redirect to `{SSO_URL}/edit-password` |
 | **Portal** | `sso.portal` | Redirect to `{SSO_URL}/portal` (switch app / role) |

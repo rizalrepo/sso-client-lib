@@ -2,6 +2,14 @@
 
 All notable changes are documented here. Format: [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.2.0] - 2026-07-14
+
+### Added
+
+- Laravel: route `GET /sso/leave-impersonate` (`sso.leave-impersonate`) — logout lokal + redirect ke `{SSO_URL}/impersonate/leave`.
+- Laravel: `SSOController::leaveImpersonate()` untuk kembali ke admin SSO setelah impersonate.
+- Laravel: simpan `session('sso_impersonator')` dari payload `GET /api/user` saat connect.
+
 ## [2.1.2] - 2026-07-08
 
 ### Changed

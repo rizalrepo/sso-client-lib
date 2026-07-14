@@ -12,6 +12,7 @@ Route::controller(SSOController::class)->group(function () {
     Route::middleware('auth')->group(function () {
         Route::get('/sso/logout', 'logout')->name('sso.logout');
         Route::get('/sso/portal', 'portal')->name('sso.portal');
+        Route::get('/sso/leave-impersonate', 'leaveImpersonate')->name('sso.leave-impersonate');
         Route::get('/sso/profile', 'editProfile')->name('sso.profile');
         Route::get('/sso/edit-password', 'editPassword')->name('sso.edit-password');
     });
